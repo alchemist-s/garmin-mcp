@@ -170,6 +170,31 @@ Read-only by default. Setting `GARMIN_MCP_ENABLE_WRITES=1` adds
 Nothing deletes, by design — these tools act on a real health record that syncs
 back to the watch.
 
+## Privacy
+
+Everything runs on your own computer. Requests go straight from your machine to
+Garmin: there is no server operated by the author, no telemetry, no analytics
+and no error reporting.
+
+**Your password** is used once, to obtain an access token. The token is saved at
+`~/.garminconnect` (mode `0600` inside a `0700` directory) and the password is
+not used again unless that token is rejected — after about a year, or if you
+change your Garmin password. The password is never written to disk by this
+server, never logged, and goes nowhere except Garmin's own sign-in service.
+
+**Your health data** is fetched on demand and never cached. Note that anything
+you ask about becomes part of your Claude conversation, which Anthropic
+processes under [their privacy policy](https://www.anthropic.com/legal/privacy).
+
+**Scope.** Read-only unless `GARMIN_MCP_ENABLE_WRITES=1` (or the equivalent
+install option). Even then it can only rename an activity and record weight or
+hydration — no tool for deleting anything exists in this server.
+
+**Removing it.** Uninstall the extension, delete `~/.garminconnect`, or change
+your Garmin password to invalidate the token from Garmin's side.
+
+Not intended for use by anyone under 16.
+
 ## Troubleshooting
 
 - **"No Garmin tokens…"** — run `garmin-mcp login`.

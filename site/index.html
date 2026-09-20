@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garmin Connect for Claude</title>
+<meta name="description" content="Ask Claude about your Garmin sleep, HRV, training and activity data. One file, one click, runs on your own computer.">
+<meta property="og:title" content="Garmin Connect for Claude">
+<meta property="og:description" content="Ask Claude about your Garmin sleep, HRV, training and activity data.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<main>
+  <h1>Ask Claude about your Garmin data</h1>
+  <p class="lede">Sleep, overnight HRV, Body Battery, training load, runs and
+  splits — available in conversation, straight from your own Garmin account.</p>
+
+  <div class="cta-row">
+    <a class="cta" href="https://github.com/alchemist-s/garmin-mcp/releases/latest/download/garmin-connect.mcpb">Download for Claude Desktop</a>
+    <a href="https://github.com/alchemist-s/garmin-mcp">View the source</a>
+  </div>
+  <p class="cta-note">Download the file and open it. Claude Desktop does the rest —
+  no Python, no terminal, no config files.</p>
+
+  <h2>What you can ask</h2>
+  <div class="grid">
+    <div class="card"><h3>How did I sleep?</h3><p>Stages, sleep score, overnight SpO2 and breathing rate.</p></div>
+    <div class="card"><h3>Am I recovered?</h3><p>HRV against your baseline, Body Battery, stress, resting heart rate.</p></div>
+    <div class="card"><h3>How was that run?</h3><p>Pace, per-kilometre splits, heart rate, power, cadence, elevation.</p></div>
+    <div class="card"><h3>How's my week been?</h3><p>Steps, intensity minutes, training load, activities over any date range.</p></div>
+  </div>
+
+  <h2>Installing it</h2>
+  <ol class="steps">
+    <li><strong>Download the file</strong> and open it. Claude Desktop shows an install dialog.</li>
+    <li><strong>Enter your Garmin email and password.</strong> The password is used once, to get an access token that is then saved on your computer.</li>
+    <li><strong>Ask it something.</strong> If your Garmin account uses two-step verification, Garmin emails you a code — paste it into the conversation and Claude finishes signing in. You won't be asked again for about a year.</li>
+  </ol>
+
+  <h2>Before you install</h2>
+  <div class="note">
+    <p><strong>It reads; it doesn't delete.</strong> Read-only unless you switch
+    on "Allow changes to my Garmin data" at install. Even then it can only rename
+    an activity or log a weight — there is no delete function anywhere in it.</p>
+    <p><strong>Your data goes to Claude.</strong> Anything you ask about becomes
+    part of your conversation, which Anthropic processes. That's how Claude works,
+    and it's worth knowing before you point it at health data.</p>
+    <p><strong>It uses Garmin's private app interface.</strong> Garmin's official
+    API needs a commercial partner agreement, so this talks to the same interface
+    the Garmin Connect app does. It isn't supported by Garmin and could stop
+    working if they change it.</p>
+    <p><strong>What you get depends on your watch.</strong> Garmin only computes
+    training readiness, training status and VO2 max on some devices. On the
+    others those come back empty — that's the watch, not a fault.</p>
+  </div>
+
+  <h2>Where things run</h2>
+  <p>Everything happens on your own computer. Requests go straight from your
+  machine to Garmin — there is no server in between, nothing is sent to the
+  author, and there is no analytics of any kind. The
+  <a href="/privacy">privacy page</a> spells out exactly what happens to your
+  password and your data, and the source is public so you can check it.</p>
+
+  <footer>
+    <a href="/privacy">Privacy</a>
+    <a href="https://github.com/alchemist-s/garmin-mcp">Source</a>
+    <a href="https://github.com/alchemist-s/garmin-mcp/issues">Report a problem</a>
+    <a href="https://github.com/alchemist-s/garmin-mcp/releases">Releases</a>
+  </footer>
+</main>
+</body>
+</html>

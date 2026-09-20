@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy — Garmin Connect for Claude</title>
+<meta name="description" content="What happens to your Garmin password and health data when you use this extension.">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<main class="prose">
+  <p class="back"><a href="/">← Garmin Connect for Claude</a></p>
+  <h1>Privacy</h1>
+  <p class="lede">This extension runs entirely on your own computer. There is no
+  server operated by the author, and nothing is sent to the author — no data, no
+  telemetry, no analytics, no error reports.</p>
+
+  <p class="updated">Last updated 20 September 2026.</p>
+
+  <h2>Your Garmin password</h2>
+  <p>When you install the extension, Claude Desktop asks for your Garmin email
+  and password and stores them in its own configuration. They are passed to the
+  extension when it starts.</p>
+  <p>The password is used <strong>once</strong>, to ask Garmin for an access
+  token. That token is then saved on your computer at
+  <code>~/.garminconnect</code>, readable only by your user account, and the
+  password is not used again unless the token is rejected — typically after about
+  a year, or if you change your Garmin password.</p>
+  <p>Your password is never written to disk by this extension, never logged, and
+  never transmitted anywhere except directly to Garmin's own sign-in service.</p>
+
+  <h2>Your health data</h2>
+  <p>Requests go directly from your computer to Garmin. There is no intermediary.</p>
+  <p><strong>Data you ask about is sent to Anthropic.</strong> That is how Claude
+  works: when you ask "how did I sleep last night?", the answer from Garmin becomes
+  part of your conversation, and conversations are processed by Anthropic under
+  <a href="https://www.anthropic.com/legal/privacy">their privacy policy</a>. Only
+  what a question actually requires is fetched — asking about sleep does not send
+  your activity history.</p>
+  <p>Nothing is stored by the extension beyond the access token. There is no
+  database, no cache of your health data, and no copy kept after a conversation
+  ends.</p>
+
+  <h2>What it can and cannot do</h2>
+  <p>The extension is <strong>read-only by default</strong>. Unless you switch on
+  "Allow changes to my Garmin data" during installation, it can only read.</p>
+  <p>With that setting on, it may rename an activity and record a weight or
+  hydration entry. <strong>It can never delete anything</strong> — no tool for
+  deleting activities, records or measurements exists in the extension at all.</p>
+
+  <h2>How it connects to Garmin</h2>
+  <p>Garmin's official API is only issued under a commercial partner agreement,
+  so this uses the same private interface the Garmin Connect mobile app uses. It
+  is not supported or endorsed by Garmin, and it may stop working if Garmin
+  changes that interface. It reads your own account, using your own credentials.</p>
+
+  <h2>Removing it</h2>
+  <p>Uninstall the extension in Claude Desktop, which removes the stored
+  credentials. To remove the saved access token as well, delete the
+  <code>~/.garminconnect</code> folder. To cut access from Garmin's side, change
+  your Garmin password, which invalidates the token.</p>
+
+  <h2>Children</h2>
+  <p>This extension is not intended for use by anyone under 16.</p>
+
+  <h2>Questions</h2>
+  <p>The source code is public: every claim on this page can be checked against it.
+  Raise anything you find on
+  <a href="https://github.com/alchemist-s/garmin-mcp/issues">the issue tracker</a>.</p>
+</main>
+</body>
+</html>

@@ -14,6 +14,10 @@ build/
 *.egg-info/
 
 tests/
+
+# Website files belong on Vercel, not inside the extension.
+site/
+vercel.json
 .mcpbignore
 *.mcpb
 .DS_Store

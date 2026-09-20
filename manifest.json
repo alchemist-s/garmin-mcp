@@ -12,14 +12,23 @@
   "homepage": "https://github.com/alchemist-s/garmin-mcp",
   "documentation": "https://github.com/alchemist-s/garmin-mcp#readme",
   "support": "https://github.com/alchemist-s/garmin-mcp/issues",
-  "keywords": ["garmin", "health", "fitness", "sleep", "running"],
+  "keywords": [
+    "garmin",
+    "health",
+    "fitness",
+    "sleep",
+    "running"
+  ],
   "license": "MIT",
   "server": {
     "type": "uv",
     "entry_point": "entry.py",
     "mcp_config": {
       "command": "uv",
-      "args": ["run", "entry.py"],
+      "args": [
+        "run",
+        "entry.py"
+      ],
       "env": {
         "GARMIN_EMAIL": "${user_config.email}",
         "GARMIN_PASSWORD": "${user_config.password}",
@@ -51,6 +60,13 @@
   },
   "compatibility": {
     "claude_desktop": ">=0.10.0",
-    "platforms": ["darwin", "win32", "linux"]
-  }
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ]
+  },
+  "privacy_policies": [
+    "https://github.com/alchemist-s/garmin-mcp#privacy"
+  ]
 }

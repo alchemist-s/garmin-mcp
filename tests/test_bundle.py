@@ -40,3 +40,19 @@ def test_writes_are_off_by_default_in_the_bundle():
 def test_entry_point_exists_and_is_listed():
     entry = _manifest()["server"]["entry_point"]
     assert (ROOT / entry).is_file()
+
+
+def test_privacy_policy_is_declared_over_https():
+    """The Connectors Directory rejects bundles without a reachable privacy policy."""
+    policies = _manifest().get("privacy_policies")
+    assert policies, "manifest must declare privacy_policies"
+    assert all(url.startswith("https://") for url in policies)
+
+
+def test_readme_has_a_privacy_section():
+    assert "## Privacy" in (ROOT / "README.md").read_text()
+
+
+def test_site_pages_exist_for_the_policy_link():
+    assert (ROOT / "site" / "index.html").is_file()
+    assert (ROOT / "site" / "privacy.html").is_file()

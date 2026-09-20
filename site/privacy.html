@@ -3,13 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Privacy — Garmin Connect for Claude</title>
-<meta name="description" content="What happens to your Garmin password and health data when you use this extension.">
+<title>Privacy — Zone Two</title>
+<meta name="description" content="What happens to your Garmin password and health data when you use Zone Two.">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+<div class="wrap">
+  <header class="site-head">
+    <a class="brand" href="/">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-opacity=".18" stroke-width="2.5"/>
+        <path d="M16 2a14 14 0 0 1 12.12 7" stroke="#146b52" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M8 17.5h3.2l2-4.6 2.6 8 2.4-5.4 1.5 2h4.3" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Zone Two</span>
+    </a>
+    <nav class="head-links"><a href="/">Home</a><a href="https://github.com/alchemist-s/zonetwo">Source</a></nav>
+  </header>
 <main class="prose">
-  <p class="back"><a href="/">← Garmin Connect for Claude</a></p>
+  
   <h1>Privacy</h1>
   <p class="lede">This extension runs entirely on your own computer. There is no
   server operated by the author, and nothing is sent to the author — no data, no
@@ -26,7 +40,7 @@
   <code>~/.garminconnect</code>, readable only by your user account, and the
   password is not used again unless the token is rejected — typically after about
   a year, or if you change your Garmin password.</p>
-  <p>Your password is never written to disk by this extension, never logged, and
+  <p>Your password is never written to disk by Zone Two, never logged, and
   never transmitted anywhere except directly to Garmin's own sign-in service.</p>
 
   <h2>Your health data</h2>
@@ -42,7 +56,7 @@
   ends.</p>
 
   <h2>What it can and cannot do</h2>
-  <p>The extension is <strong>read-only by default</strong>. Unless you switch on
+  <p>Zone Two is <strong>read-only by default</strong>. Unless you switch on
   "Allow changes to my Garmin data" during installation, it can only read.</p>
   <p>With that setting on, it may rename an activity and record a weight or
   hydration entry. <strong>It can never delete anything</strong> — no tool for
@@ -55,7 +69,7 @@
   changes that interface. It reads your own account, using your own credentials.</p>
 
   <h2>Removing it</h2>
-  <p>Uninstall the extension in Claude Desktop, which removes the stored
+  <p>Uninstall Zone Two in Claude Desktop, which removes the stored
   credentials. To remove the saved access token as well, delete the
   <code>~/.garminconnect</code> folder. To cut access from Garmin's side, change
   your Garmin password, which invalidates the token.</p>
@@ -66,7 +80,16 @@
   <h2>Questions</h2>
   <p>The source code is public: every claim on this page can be checked against it.
   Raise anything you find on
-  <a href="https://github.com/alchemist-s/garmin-mcp/issues">the issue tracker</a>.</p>
+  <a href="https://github.com/alchemist-s/zonetwo/issues">the issue tracker</a>.</p>
 </main>
+  <footer>
+    <div class="foot-row">
+      <div><a href="/">Home</a><a href="https://github.com/alchemist-s/zonetwo">Source</a></div>
+      <div>MIT licensed</div>
+    </div>
+    <p class="disclaimer">Zone Two is an independent open-source project, not affiliated with or
+    endorsed by Garmin. Garmin and Garmin Connect are trademarks of Garmin Ltd.</p>
+  </footer>
+</div>
 </body>
 </html>

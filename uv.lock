@@ -409,34 +409,6 @@ wheels = [
 ]
 
 [[package]]
-name = "garmin-mcp"
-version = "0.2.1"
-source = { editable = "." }
-dependencies = [
-    { name = "garminconnect", version = "0.3.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
-    { name = "garminconnect", version = "0.3.16", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
-    { name = "mcp", extra = ["cli"] },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "anyio" },
-    { name = "pytest" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "garminconnect", specifier = ">=0.3.2" },
-    { name = "mcp", extras = ["cli"], specifier = ">=2.0.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "anyio", specifier = ">=4.15.1" },
-    { name = "pytest", specifier = ">=8.0" },
-]
-
-[[package]]
 name = "garminconnect"
 version = "0.3.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1138,4 +1110,32 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/5d/ad/04bbb797c84fc1f26cb171f7394716f4865ffb8d8c5e1eef42565c2dfa6b/uvicorn-0.53.0.tar.gz", hash = "sha256:a9356f0cb89b3b8621529c5d5eebd69bfe154f4c3f68b4cf2de47e45fa855c2e", size = 110881, upload-time = "2026-09-14T07:44:23.815Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/76/18/0eea75741ee812e9f598b687619ce2454f6c3a1c5cd21ea990ec6bd26f45/uvicorn-0.53.0-py3-none-any.whl", hash = "sha256:e8dca71ec86dce5f04e333f0d56cdedf942446e6643b9cea1af0d6d3a02cb03e", size = 87081, upload-time = "2026-09-14T07:44:22.179Z" },
+]
+
+[[package]]
+name = "zonetwo"
+version = "0.3.0"
+source = { editable = "." }
+dependencies = [
+    { name = "garminconnect", version = "0.3.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "garminconnect", version = "0.3.16", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "mcp", extra = ["cli"] },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "anyio" },
+    { name = "pytest" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "garminconnect", specifier = ">=0.3.2" },
+    { name = "mcp", extras = ["cli"], specifier = ">=2.0.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "anyio", specifier = ">=4.15.1" },
+    { name = "pytest", specifier = ">=8.0" },
 ]

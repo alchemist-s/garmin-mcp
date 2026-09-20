@@ -18,12 +18,12 @@ NO_TTY_HELP = """Logging in needs an interactive terminal, and this shell has no
 
 Either run it in a real terminal:
 
-    cd {project} && uv run garmin-mcp login
+    cd {project} && uv run zonetwo login
 
 or supply credentials through the environment (only works if your Garmin
 account has MFA turned off, since an MFA code cannot be prompted for here):
 
-    GARMIN_EMAIL=you@example.com GARMIN_PASSWORD=... uv run garmin-mcp login
+    GARMIN_EMAIL=you@example.com GARMIN_PASSWORD=... uv run zonetwo login
 """
 
 
@@ -35,7 +35,7 @@ def _prompt_mfa() -> str:
     if not _interactive():
         raise GarminConnectAuthenticationError(
             "This account requires an MFA code, which needs an interactive "
-            "terminal. Run `garmin-mcp login` from a real terminal."
+            "terminal. Run `zonetwo login` from a real terminal."
         )
     return input("Garmin MFA code: ").strip()
 
@@ -45,7 +45,7 @@ def _login(args: argparse.Namespace) -> int:
 
     if store.exists() and not args.force:
         print(f"Tokens already exist at {store}.")
-        print("Re-run with --force to replace them, or `garmin-mcp status` to check them.")
+        print("Re-run with --force to replace them, or `zonetwo status` to check them.")
         return 0
 
     email = args.email or os.getenv("GARMIN_EMAIL")
@@ -96,7 +96,7 @@ def _status(args: argparse.Namespace) -> int:
     store = connection.tokenstore_path()
     if not store.exists():
         print(f"Not logged in — no token store at {store}.")
-        print("Run `garmin-mcp login`.")
+        print("Run `zonetwo login`.")
         return 1
     try:
         client = connection.client()
@@ -267,7 +267,7 @@ def _check(args: argparse.Namespace) -> int:
 
     store = connection.tokenstore_path()
     if not store.exists():
-        print(f"Not logged in — no token store at {store}. Run `garmin-mcp login`.", file=sys.stderr)
+        print(f"Not logged in — no token store at {store}. Run `zonetwo login`.", file=sys.stderr)
         return 1
     print(f"Calling every read-only tool against the live account ({store}):\n")
     return anyio.run(_check_tools, args.date)
@@ -282,7 +282,7 @@ def _serve(args: argparse.Namespace) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="garmin-mcp", description="Garmin Connect MCP server."
+        prog="zonetwo", description="Garmin Connect MCP server."
     )
     sub = parser.add_subparsers(dest="command")
 

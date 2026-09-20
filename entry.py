@@ -10,6 +10,6 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / "src"))
 
-from garmin_mcp.cli import main  # noqa: E402
+from zonetwo.cli import main  # noqa: E402
 
 raise SystemExit(main(["serve"]))

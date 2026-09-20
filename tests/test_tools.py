@@ -7,7 +7,7 @@ import pytest
 
 from mcp.server.mcpserver.exceptions import ToolError
 
-from garmin_mcp import connection, server
+from zonetwo import connection, server
 
 
 @pytest.mark.anyio

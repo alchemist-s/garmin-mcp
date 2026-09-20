@@ -3,7 +3,7 @@
 import pytest
 from mcp.server.mcpserver.exceptions import ToolError
 
-from garmin_mcp import connection, server
+from zonetwo import connection, server
 
 
 class FakeInner:
@@ -133,7 +133,7 @@ def test_expired_tokens_without_credentials_ask_for_the_cli(monkeypatch, tmp_pat
     (store / "garmin_tokens.json").write_text("{}")
     FakeGarmin.token_login_fails = True
 
-    with pytest.raises(connection.NotLoggedIn, match="garmin-mcp login"):
+    with pytest.raises(connection.NotLoggedIn, match="zonetwo login"):
         connection.client()
 
 

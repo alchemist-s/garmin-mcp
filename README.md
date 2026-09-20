@@ -1,8 +1,10 @@
-# garmin-mcp
+# Zone Two
 
-An MCP server that reads your Garmin Connect data — sleep, HRV, training
-readiness, activities, body composition — so an assistant can answer questions
-about it directly.
+Your training log, in conversation. An MCP server that reads your own Garmin
+Connect data — sleep, HRV, training readiness, activities, body composition —
+so Claude can answer questions about it directly.
+
+**[zonetwo.vercel.app](https://zonetwo.vercel.app)** · not affiliated with Garmin.
 
 ## Authentication, and the caveat
 
@@ -21,9 +23,9 @@ just hang.
 
 ## Install (Claude Desktop)
 
-Download **garmin-connect.mcpb** from
-[the website](https://garmin-mcp-sepia.vercel.app) or the
-[latest release](https://github.com/alchemist-s/garmin-mcp/releases/latest), and
+Download **zonetwo.mcpb** from
+[zonetwo.vercel.app](https://zonetwo.vercel.app) or the
+[latest release](https://github.com/alchemist-s/zonetwo/releases/latest), and
 open it. Claude Desktop shows an install dialog asking for your Garmin email
 and password. Nothing else is needed — no Python, no terminal, no config files.
 
@@ -41,11 +43,11 @@ token is ever rejected.
 Requires [uv](https://docs.astral.sh/uv/) and Python 3.11+.
 
 ```sh
-git clone https://github.com/alchemist-s/garmin-mcp.git
-cd garmin-mcp
+git clone https://github.com/alchemist-s/zonetwo.git
+cd zonetwo
 uv sync
-uv run garmin-mcp login     # prompts for email, password, and MFA code if enabled
-uv run garmin-mcp status    # confirms the tokens work
+uv run zonetwo login     # prompts for email, password, and MFA code if enabled
+uv run zonetwo status    # confirms the tokens work
 ```
 
 `login` must run in a real terminal — it prompts for a password and, if your
@@ -55,7 +57,7 @@ Claude Code's `!` prefix), and says so rather than failing with a traceback.
 With MFA off, credentials can come from the environment instead:
 
 ```sh
-GARMIN_EMAIL=you@example.com GARMIN_PASSWORD=... uv run garmin-mcp login
+GARMIN_EMAIL=you@example.com GARMIN_PASSWORD=... uv run zonetwo login
 ```
 
 Garmin rate-limits login attempts by IP and can answer `429` on the first
@@ -68,7 +70,7 @@ Tokens land in `~/.garminconnect` (override with `GARMINTOKENS`), written
 ### Wire it into Claude Code
 
 ```sh
-claude mcp add garmin --scope user -- uv --directory /absolute/path/to/garmin-mcp run garmin-mcp
+claude mcp add zonetwo --scope user -- uv --directory /absolute/path/to/zonetwo run zonetwo
 ```
 
 Use an absolute path — the stored config does not expand `~`. `--scope user`
@@ -84,7 +86,7 @@ In `~/Library/Application Support/Claude/claude_desktop_config.json`:
   "mcpServers": {
     "garmin": {
       "command": "uv",
-      "args": ["--directory", "/absolute/path/to/garmin-mcp", "run", "garmin-mcp"]
+      "args": ["--directory", "/absolute/path/to/zonetwo", "run", "zonetwo"]
     }
   }
 }
@@ -160,7 +162,7 @@ But Garmin computes different metrics on different hardware, and the API returns
 an empty response rather than an error for the ones your device does not
 support. On a Venu 3, for instance, `garmin_training_readiness` returns a
 literal `[]` and `garmin_training_status` comes back with every field null:
-those are Forerunner/Fenix features. `garmin-mcp check` reports that as `none`
+those are Forerunner/Fenix features. `zonetwo check` reports that as `none`
 rather than `ok`, so you can tell "my watch doesn't do this" from "this is
 broken".
 
@@ -198,14 +200,14 @@ Not intended for use by anyone under 16.
 
 ## Troubleshooting
 
-- **"No Garmin tokens…"** — run `garmin-mcp login`.
+- **"No Garmin tokens…"** — run `zonetwo login`.
 - **Tokens rejected** — they expire after about a year, and a password change
-  invalidates them. `garmin-mcp login --force`.
+  invalidates them. `zonetwo login --force`.
 - **Rate-limited** — Garmin throttles per account. Wait a few minutes; avoid
   looping over long date ranges a day at a time.
 - **Today's numbers look wrong** — Garmin only has what the watch last synced to
   your phone.
-- **China accounts** — `garmin-mcp login --china`.
+- **China accounts** — `zonetwo login --china`.
 
 ## Testing
 
@@ -223,8 +225,8 @@ response shaping, every tool's projection logic, and the error paths.
 **2. Live smoke test — one command, hits your real account.**
 
 ```sh
-uv run garmin-mcp login     # once
-uv run garmin-mcp check
+uv run zonetwo login     # once
+uv run zonetwo check
 ```
 
 `check` calls every read-only tool through the real MCP dispatch path and
@@ -245,7 +247,7 @@ that has definitely synced; today is often partial.
 **3. MCP Inspector — poke individual tools in a browser.**
 
 ```sh
-uv run mcp dev src/garmin_mcp/server.py:mcp --with-editable .
+uv run mcp dev src/zonetwo/server.py:mcp --with-editable .
 ```
 
 Opens a UI where you can list tools, read their schemas, and call them with
@@ -255,7 +257,7 @@ runs the server in its own environment, which otherwise lacks `garminconnect`.
 **4. End to end in Claude Code.**
 
 ```sh
-claude mcp add garmin --scope user -- uv --directory /absolute/path/to/garmin-mcp run garmin-mcp
+claude mcp add zonetwo --scope user -- uv --directory /absolute/path/to/zonetwo run zonetwo
 claude mcp list          # should show garmin as connected
 ```
 

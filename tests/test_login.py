@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from garmin_mcp import cli
+from zonetwo import cli
 
 
 def _args(**overrides):

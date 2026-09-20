@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0
+
+Renamed to **Zone Two**. The package, the CLI command and the bundle are now
+`zonetwo`; the repository moved to `alchemist-s/zonetwo` and the site to
+zonetwo.vercel.app. Garmin is named only where it describes what the software
+connects to, never as branding.
+
+- Rebuilt the website: an example conversation, a visual identity, and a
+  trademark disclaimer.
+- The CLI is `zonetwo` rather than `garmin-mcp`. Tool names keep their
+  `garmin_` prefix, since they describe the data source rather than the product.
+
 ## 0.2.1
 
 - Point the bundle's privacy policy at the published site.

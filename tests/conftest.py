@@ -1,6 +1,6 @@
 import pytest
 
-from garmin_mcp import connection
+from zonetwo import connection
 
 
 @pytest.fixture

@@ -2,7 +2,7 @@
 
 import pytest
 
-from garmin_mcp import cli, connection
+from zonetwo import cli, connection
 
 
 @pytest.mark.anyio

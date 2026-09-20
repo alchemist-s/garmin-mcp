@@ -1,7 +1,7 @@
 """Garmin Connect session handling.
 
 The MCP server never logs in with a password. Credentials are exchanged for
-OAuth tokens once, interactively, by ``garmin-mcp login``; the server only ever
+OAuth tokens once, interactively, by ``zonetwo login``; the server only ever
 resumes from that token store. MFA cannot be answered over stdio, so a server
 that tried to log in would simply hang.
 """
@@ -124,7 +124,7 @@ def _connect() -> Garmin:
                 raise NotLoggedIn(
                     f"Garmin tokens at {store} were rejected ({exc}). They expire "
                     "after about a year, or when the password changes — run "
-                    "`garmin-mcp login` again."
+                    "`zonetwo login` again."
                 ) from exc
 
     email, password = _credentials()
@@ -132,7 +132,7 @@ def _connect() -> Garmin:
         return _login_with_credentials(email, password, store)
 
     raise NotLoggedIn(
-        f"No Garmin tokens at {store}. Run `garmin-mcp login` once to create "
+        f"No Garmin tokens at {store}. Run `zonetwo login` once to create "
         "them, or set GARMIN_EMAIL and GARMIN_PASSWORD."
     )
 

@@ -6,7 +6,7 @@ from garminconnect import (
     GarminConnectTooManyRequestsError,
 )
 
-from garmin_mcp import connection
+from zonetwo import connection
 
 
 @pytest.fixture(autouse=True)
@@ -55,7 +55,7 @@ async def test_rate_limit_message_reaches_the_model(monkeypatch):
     """A 429 that survives retries must arrive as actionable text, not 'Error executing tool'."""
     from mcp.server.mcpserver.exceptions import ToolError
 
-    from garmin_mcp import server
+    from zonetwo import server
 
     client = FlakyClient(failures=99)
     monkeypatch.setattr(connection, "client", lambda: client)

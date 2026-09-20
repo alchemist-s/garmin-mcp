@@ -1,23 +1,24 @@
 {
   "manifest_version": "0.4",
-  "name": "garmin-connect",
-  "display_name": "Garmin Connect",
-  "version": "0.2.1",
-  "description": "Ask about your Garmin sleep, HRV, training and activity data.",
-  "long_description": "Reads health, sleep, training and activity data from your own Garmin Connect account: sleep stages and score, overnight HRV, Body Battery, stress, SpO2, steps, weigh-ins, activities with per-lap splits, and a one-call morning briefing.\n\nSign-in happens once. Enter your Garmin email and password below; if your account uses two-step verification, Garmin emails you a code and Claude will ask for it in the conversation. After that a saved token keeps you signed in for about a year.\n\nThis uses the same private API the Garmin Connect app uses, because Garmin's official API is only issued under a commercial partner agreement. It is unsupported by Garmin and reads your data only.",
+  "name": "zonetwo",
+  "display_name": "Zone Two",
+  "version": "0.3.0",
+  "description": "Your training log, in conversation. Works with Garmin Connect.",
+  "long_description": "Zone Two reads your own Garmin Connect account so you can ask about it in plain language: sleep stages and score, overnight HRV against your baseline, Body Battery, stress, steps, weigh-ins, and activities with per-kilometre splits. It also answers \"how am I doing today?\" in a single call.\n\nSign in once. Enter your Garmin email and password below; if your account uses two-step verification, Garmin emails you a code and Claude asks for it in the conversation. After that a saved token keeps you signed in for about a year.\n\nEverything runs on your own computer. Requests go straight to Garmin \u2014 there is no server in between and no analytics of any kind. Zone Two is not affiliated with or endorsed by Garmin; it uses the same private interface the Garmin Connect app uses, because Garmin's official API requires a commercial partner agreement.",
   "author": {
     "name": "Shahed",
     "url": "https://github.com/alchemist-s"
   },
-  "homepage": "https://garmin-mcp-sepia.vercel.app",
-  "documentation": "https://github.com/alchemist-s/garmin-mcp#readme",
-  "support": "https://github.com/alchemist-s/garmin-mcp/issues",
+  "homepage": "https://zonetwo.vercel.app",
+  "documentation": "https://github.com/alchemist-s/zonetwo#readme",
+  "support": "https://github.com/alchemist-s/zonetwo/issues",
   "keywords": [
     "garmin",
     "health",
     "fitness",
     "sleep",
-    "running"
+    "running",
+    "training"
   ],
   "license": "MIT",
   "server": {
@@ -46,7 +47,7 @@
     "password": {
       "type": "string",
       "title": "Garmin password",
-      "description": "Used once to obtain a token, then kept only by Claude's secure storage.",
+      "description": "Used once to obtain an access token, then stored only by Claude Desktop. Zone Two never writes it to disk.",
       "sensitive": true,
       "required": true
     },
@@ -67,6 +68,6 @@
     ]
   },
   "privacy_policies": [
-    "https://garmin-mcp-sepia.vercel.app/privacy"
+    "https://zonetwo.vercel.app/privacy"
   ]
 }

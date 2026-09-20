@@ -2,7 +2,7 @@
 
 import pytest
 
-from garmin_mcp import server
+from zonetwo import server
 
 
 @pytest.mark.anyio

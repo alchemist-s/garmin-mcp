@@ -28,10 +28,10 @@ jobs:
         run: npx -y @anthropic-ai/mcpb@2 validate manifest.json
 
       - name: Pack bundle
-        run: npx -y @anthropic-ai/mcpb@2 pack . dist/garmin-connect.mcpb
+        run: npx -y @anthropic-ai/mcpb@2 pack . dist/zonetwo.mcpb
 
       - name: Attach to release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/garmin-connect.mcpb
+          files: dist/zonetwo.mcpb
           generate_release_notes: true

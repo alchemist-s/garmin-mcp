@@ -1,7 +1,7 @@
 [project]
-name = "garmin-mcp"
-version = "0.2.1"
-description = "MCP server for Garmin Connect health, sleep, training and activity data"
+name = "zonetwo"
+version = "0.3.0"
+description = "Zone Two — your training log in conversation. Reads Garmin Connect health, sleep, training and activity data."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -16,12 +16,12 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/alchemist-s/garmin-mcp"
-Repository = "https://github.com/alchemist-s/garmin-mcp"
-Issues = "https://github.com/alchemist-s/garmin-mcp/issues"
+Homepage = "https://zonetwo.vercel.app"
+Repository = "https://github.com/alchemist-s/zonetwo"
+Issues = "https://github.com/alchemist-s/zonetwo/issues"
 
 [project.scripts]
-garmin-mcp = "garmin_mcp.cli:main"
+zonetwo = "zonetwo.cli:main"
 
 [build-system]
 requires = ["uv_build>=0.11.16,<0.12.0"]

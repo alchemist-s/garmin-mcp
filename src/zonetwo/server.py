@@ -39,7 +39,7 @@ WRITES_ENABLED = os.getenv("GARMIN_MCP_ENABLE_WRITES", "").lower() in {"1", "tru
 
 mcp = MCPServer(
     name="garmin",
-    version=version("garmin-mcp"),
+    version=version("zonetwo"),
     instructions=(
         "Read health, sleep, training and activity data from the signed-in user's "
         "Garmin Connect account. Dates accept YYYY-MM-DD, 'today', 'yesterday' or "

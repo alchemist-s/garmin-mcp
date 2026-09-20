@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 import pytest
 
-from garmin_mcp.shaping import (
+from zonetwo.shaping import (
     add_pace,
     cap,
     date_range,

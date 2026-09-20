@@ -28,6 +28,20 @@ uv run garmin-mcp login     # prompts for email, password, and MFA code if enabl
 uv run garmin-mcp status    # confirms the tokens work
 ```
 
+`login` must run in a real terminal — it prompts for a password and, if your
+account has MFA, a code. It cannot run through a non-interactive shell (such as
+Claude Code's `!` prefix), and says so rather than failing with a traceback.
+
+With MFA off, credentials can come from the environment instead:
+
+```sh
+GARMIN_EMAIL=you@example.com GARMIN_PASSWORD=... uv run garmin-mcp login
+```
+
+Garmin rate-limits login attempts by IP and can answer `429` on the first
+strategy the client tries. The library falls back across several; if the whole
+attempt fails that way, wait a few minutes rather than retrying immediately.
+
 Tokens land in `~/.garminconnect` (override with `GARMINTOKENS`), written
 `0600` in a `0700` directory.
 

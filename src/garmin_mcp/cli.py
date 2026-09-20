@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import getpass
+import os
 import shutil
 import sys
 from pathlib import Path
@@ -13,7 +14,29 @@ from garminconnect import Garmin, GarminConnectAuthenticationError
 from . import connection
 
 
+NO_TTY_HELP = """Logging in needs an interactive terminal, and this shell has none.
+
+Either run it in a real terminal:
+
+    cd {project} && uv run garmin-mcp login
+
+or supply credentials through the environment (only works if your Garmin
+account has MFA turned off, since an MFA code cannot be prompted for here):
+
+    GARMIN_EMAIL=you@example.com GARMIN_PASSWORD=... uv run garmin-mcp login
+"""
+
+
+def _interactive() -> bool:
+    return sys.stdin.isatty()
+
+
 def _prompt_mfa() -> str:
+    if not _interactive():
+        raise GarminConnectAuthenticationError(
+            "This account requires an MFA code, which needs an interactive "
+            "terminal. Run `garmin-mcp login` from a real terminal."
+        )
     return input("Garmin MFA code: ").strip()
 
 
@@ -25,8 +48,21 @@ def _login(args: argparse.Namespace) -> int:
         print("Re-run with --force to replace them, or `garmin-mcp status` to check them.")
         return 0
 
-    email = args.email or input("Garmin email: ").strip()
-    password = getpass.getpass("Garmin password: ")
+    email = args.email or os.getenv("GARMIN_EMAIL")
+    password = os.getenv("GARMIN_PASSWORD")
+
+    if not email or not password:
+        if not _interactive():
+            # Prompting here would raise EOFError and print a traceback, which
+            # tells the reader nothing about what to do instead.
+            print(
+                NO_TTY_HELP.format(project=Path(__file__).resolve().parents[2]),
+                file=sys.stderr,
+            )
+            return 1
+        email = email or input("Garmin email: ").strip()
+        password = password or getpass.getpass("Garmin password: ")
+
     if not email or not password:
         print("Email and password are both required.", file=sys.stderr)
         return 1

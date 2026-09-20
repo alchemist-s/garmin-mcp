@@ -1,6 +1,7 @@
-/* Zone Two. Light by default and warm rather than clinical: the audience is
-   runners, not developers. Dark mode is a gentle inversion, not a black page. */
+/* Zone Two. One light theme, deliberately: a landing page should look the
+   same to everyone who arrives, not change with the visitor's OS setting. */
 :root {
+  color-scheme: light;
   --bg: #fdfcfa;
   --surface: #ffffff;
   --surface-2: #f5f3ef;
@@ -15,22 +16,6 @@
   --radius: 12px;
   --radius-lg: 20px;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #1c1a18; --surface: #232120; --surface-2: #2a2725;
-    --text: #f0ece6; --muted: #a9a29a; --line: #35312e;
-    --accent: #e08256; --accent-soft: #2e231d; --accent-text: #22140d;
-    --ok: #6fbf95;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px rgba(0,0,0,.28);
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #1c1a18; --surface: #232120; --surface-2: #2a2725;
-  --text: #f0ece6; --muted: #a9a29a; --line: #35312e;
-  --accent: #e08256; --accent-soft: #2e231d; --accent-text: #22140d; --ok: #6fbf95;
-  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px rgba(0,0,0,.28);
-}
-
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {

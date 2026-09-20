@@ -21,8 +21,11 @@ just hang.
 
 ## Setup
 
+Requires [uv](https://docs.astral.sh/uv/) and Python 3.11+.
+
 ```sh
-cd /Users/al/Dev/garmin-mcp
+git clone <this-repo> garmin-mcp
+cd garmin-mcp
 uv sync
 uv run garmin-mcp login     # prompts for email, password, and MFA code if enabled
 uv run garmin-mcp status    # confirms the tokens work
@@ -48,8 +51,12 @@ Tokens land in `~/.garminconnect` (override with `GARMINTOKENS`), written
 ### Wire it into Claude Code
 
 ```sh
-claude mcp add garmin -- uv --directory /Users/al/Dev/garmin-mcp run garmin-mcp
+claude mcp add garmin --scope user -- uv --directory /absolute/path/to/garmin-mcp run garmin-mcp
 ```
+
+Use an absolute path — the stored config does not expand `~`. `--scope user`
+makes the server available in every project; without it the default `local`
+scope binds it to whichever directory you ran the command from.
 
 ### Wire it into Claude Desktop
 
@@ -60,7 +67,7 @@ In `~/Library/Application Support/Claude/claude_desktop_config.json`:
   "mcpServers": {
     "garmin": {
       "command": "uv",
-      "args": ["--directory", "/Users/al/Dev/garmin-mcp", "run", "garmin-mcp"]
+      "args": ["--directory", "/absolute/path/to/garmin-mcp", "run", "garmin-mcp"]
     }
   }
 }
@@ -108,6 +115,17 @@ mostly-null fields. Every tool returns a compact projection and keeps the raw
 payload behind `raw=true`. Anything still over ~60 kB comes back as an explicit
 `truncated` marker rather than cut-off JSON — truncated JSON reads as complete
 data that happens to end early, and gets summarised as fact.
+
+### What you get depends on your watch
+
+Nothing here is tied to a particular account — log in with yours and it works.
+But Garmin computes different metrics on different hardware, and the API returns
+an empty response rather than an error for the ones your device does not
+support. On a Venu 3, for instance, `garmin_training_readiness` returns a
+literal `[]` and `garmin_training_status` comes back with every field null:
+those are Forerunner/Fenix features. `garmin-mcp check` reports that as `none`
+rather than `ok`, so you can tell "my watch doesn't do this" from "this is
+broken".
 
 ### Writes
 
@@ -175,7 +193,7 @@ runs the server in its own environment, which otherwise lacks `garminconnect`.
 **4. End to end in Claude Code.**
 
 ```sh
-claude mcp add garmin -- uv --directory /Users/al/Dev/garmin-mcp run garmin-mcp
+claude mcp add garmin --scope user -- uv --directory /absolute/path/to/garmin-mcp run garmin-mcp
 claude mcp list          # should show garmin as connected
 ```
 

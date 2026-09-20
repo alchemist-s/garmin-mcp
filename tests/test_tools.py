@@ -1,41 +1,13 @@
-"""Tool tests against a stub client shaped like real Garmin Connect payloads."""
+"""Tool tests against a stub client shaped like real Garmin Connect payloads.
+
+The ``stub`` fixture lives in conftest.py.
+"""
 
 import pytest
 
 from mcp.server.mcpserver.exceptions import ToolError
 
 from garmin_mcp import connection, server
-
-
-class StubGarmin:
-    """Records calls and returns canned payloads."""
-
-    def __init__(self, responses):
-        self.responses = responses
-        self.calls = []
-
-    def __getattr__(self, name):
-        def method(*args, **kwargs):
-            self.calls.append((name, args, kwargs))
-            value = self.responses.get(name)
-            if isinstance(value, Exception):
-                raise value
-            return value
-
-        return method
-
-
-@pytest.fixture
-def stub(monkeypatch):
-    holder = {}
-
-    def install(responses):
-        client = StubGarmin(responses)
-        holder["client"] = client
-        monkeypatch.setattr(connection, "client", lambda: client)
-        return client
-
-    return install
 
 
 @pytest.mark.anyio

@@ -113,11 +113,60 @@ back to the watch.
   your phone.
 - **China accounts** — `garmin-mcp login --china`.
 
-## Development
+## Testing
+
+Four levels, cheapest first.
+
+**1. Offline suite — no account, no network.**
 
 ```sh
 uv run pytest
 ```
 
-Tests run against a stub shaped like real Garmin payloads, so no account or
-network is needed.
+Runs against a stub shaped like real Garmin payloads. Covers date parsing,
+response shaping, every tool's projection logic, and the error paths.
+
+**2. Live smoke test — one command, hits your real account.**
+
+```sh
+uv run garmin-mcp login     # once
+uv run garmin-mcp check
+```
+
+`check` calls every read-only tool through the real MCP dispatch path and
+prints one line each:
+
+```
+  garmin_sleep                 ok    {"date": "2026-09-20", "sleepTimeSeconds": 27000, …}
+  garmin_hrv                   none  (no data for this date)
+  garmin_activity_weather      FAIL  Garmin returned 500
+
+23/24 tools responded (1 with no data), 0 failed.
+```
+
+`none` is not a failure — it means your device does not record that metric, or
+has not synced it for that date. Use `--date 2026-09-19` to test against a day
+that has definitely synced; today is often partial.
+
+**3. MCP Inspector — poke individual tools in a browser.**
+
+```sh
+uv run mcp dev src/garmin_mcp/server.py:mcp
+```
+
+Opens a UI where you can list tools, read their schemas, and call them with
+your own arguments. Needs `npx`.
+
+**4. End to end in Claude Code.**
+
+```sh
+claude mcp add garmin -- uv --directory /Users/al/Dev/garmin-mcp run garmin-mcp
+claude mcp list          # should show garmin as connected
+```
+
+Then ask something that needs real data — "how did I sleep last night?", "what
+was my longest run this month?", "is my HRV trending down?" — and check the
+numbers against the Garmin Connect app.
+
+To test the write tools, add `-e GARMIN_MCP_ENABLE_WRITES=1` to the
+`claude mcp add` command.

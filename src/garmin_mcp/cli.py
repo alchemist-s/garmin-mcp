@@ -85,6 +85,157 @@ def _logout(args: argparse.Namespace) -> int:
     return 0
 
 
+# Tools that need no arguments, plus the activity tools once an ID is known.
+# Several depend on device features (HRV, pulse ox), so "no data" is a pass.
+_SIMPLE_CHECKS = [
+    "garmin_whoami",
+    "garmin_devices",
+    "garmin_daily_summary",
+    "garmin_sleep",
+    "garmin_heart_rate",
+    "garmin_hrv",
+    "garmin_stress",
+    "garmin_body_battery",
+    "garmin_steps",
+    "garmin_spo2",
+    "garmin_respiration",
+    "garmin_intensity_minutes",
+    "garmin_training_readiness",
+    "garmin_training_status",
+    "garmin_vo2max",
+    "garmin_race_predictions",
+    "garmin_personal_records",
+    "garmin_activities",
+    "garmin_activities_by_date",
+    "garmin_last_activity",
+    "garmin_weight",
+]
+_ACTIVITY_CHECKS = ["garmin_activity", "garmin_activity_splits", "garmin_activity_weather"]
+
+
+def _preview(result: object, width: int = 88) -> str:
+    import json
+
+    payload = getattr(result, "structured_content", None)
+    if payload is None:
+        content = getattr(result, "content", None) or []
+        payload = getattr(content[0], "text", "") if content else ""
+    text = payload if isinstance(payload, str) else json.dumps(payload, default=str)
+    text = " ".join(text.split())
+    return text if len(text) <= width else text[: width - 1] + "…"
+
+
+def _is_blank(result: object, preview: str) -> bool:
+    """True when a tool succeeded but had nothing to report.
+
+    Tools signal "the device does not record this" with a lone ``note`` key;
+    reporting that as ok would overstate what the account actually returned.
+    """
+    import json
+
+    if preview in {"", "{}", "[]", "null"}:
+        return True
+    try:
+        payload = json.loads(_preview(result, width=10_000))
+    except (ValueError, TypeError):
+        return False
+    if isinstance(payload, dict):
+        if "result" in payload and payload["result"] in ([], {}, None):
+            return True
+        # A response carrying only the echoed date, or only an explanatory
+        # note, told us nothing about the account.
+        if not {k for k in payload if k not in {"note", "date"}}:
+            return True
+    return False
+
+
+async def _check_tools(date: str | None) -> int:
+    from mcp.server.mcpserver.exceptions import ToolError
+
+    from .server import mcp
+
+    plan: list[tuple[str, dict]] = []
+    for name in _SIMPLE_CHECKS:
+        arguments: dict = {}
+        if date and name not in {
+            "garmin_whoami",
+            "garmin_devices",
+            "garmin_race_predictions",
+            "garmin_personal_records",
+            "garmin_last_activity",
+            "garmin_activities",
+        }:
+            arguments = {"date": date} if name not in {
+                "garmin_body_battery",
+                "garmin_steps",
+                "garmin_activities_by_date",
+                "garmin_weight",
+            } else {"end": date}
+        plan.append((name, arguments))
+
+    failures = 0
+    empty = 0
+    activity_id = None
+
+    for name, arguments in plan:
+        try:
+            result = await mcp.call_tool(name, arguments)
+        except ToolError as exc:
+            print(f"  {name:28} FAIL  {exc}")
+            failures += 1
+            continue
+        except Exception as exc:  # noqa: BLE001 - a check run reports, never crashes
+            print(f"  {name:28} FAIL  {type(exc).__name__}: {exc}")
+            failures += 1
+            continue
+
+        preview = _preview(result)
+        if _is_blank(result, preview):
+            print(f"  {name:28} none  (no data for this date)")
+            empty += 1
+        else:
+            print(f"  {name:28} ok    {preview}")
+
+        if name == "garmin_last_activity" and activity_id is None:
+            import json
+
+            with __import__("contextlib").suppress(Exception):
+                raw = _preview(result, width=10_000)
+                activity_id = str(json.loads(raw).get("activityId") or "") or None
+
+    if activity_id:
+        for name in _ACTIVITY_CHECKS:
+            try:
+                result = await mcp.call_tool(name, {"activity_id": activity_id})
+            except Exception as exc:  # noqa: BLE001
+                print(f"  {name:28} FAIL  {type(exc).__name__}: {exc}")
+                failures += 1
+                continue
+            preview = _preview(result)
+            if _is_blank(result, preview):
+                print(f"  {name:28} none  (not recorded for this activity)")
+                empty += 1
+            else:
+                print(f"  {name:28} ok    {preview}")
+    else:
+        print(f"  {'(activity tools)':28} skip  no recent activity to test against")
+
+    total = len(plan) + (len(_ACTIVITY_CHECKS) if activity_id else 0)
+    print(f"\n{total - failures}/{total} tools responded ({empty} with no data), {failures} failed.")
+    return 1 if failures else 0
+
+
+def _check(args: argparse.Namespace) -> int:
+    import anyio
+
+    store = connection.tokenstore_path()
+    if not store.exists():
+        print(f"Not logged in — no token store at {store}. Run `garmin-mcp login`.", file=sys.stderr)
+        return 1
+    print(f"Calling every read-only tool against the live account ({store}):\n")
+    return anyio.run(_check_tools, args.date)
+
+
 def _serve(args: argparse.Namespace) -> int:
     from .server import mcp
 
@@ -109,6 +260,14 @@ def main(argv: list[str] | None = None) -> int:
 
     logout = sub.add_parser("logout", help="delete the cached tokens")
     logout.set_defaults(func=_logout)
+
+    check = sub.add_parser(
+        "check", help="call every read-only tool against the live account"
+    )
+    check.add_argument(
+        "--date", help="date to query (default: today, which may be partially synced)"
+    )
+    check.set_defaults(func=_check)
 
     serve = sub.add_parser("serve", help="run the MCP server on stdio (default)")
     serve.set_defaults(func=_serve)

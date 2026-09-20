@@ -40,7 +40,7 @@ token is ever rejected.
 Requires [uv](https://docs.astral.sh/uv/) and Python 3.11+.
 
 ```sh
-git clone <this-repo> garmin-mcp
+git clone https://github.com/alchemist-s/garmin-mcp.git
 cd garmin-mcp
 uv sync
 uv run garmin-mcp login     # prompts for email, password, and MFA code if enabled

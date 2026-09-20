@@ -151,11 +151,12 @@ that has definitely synced; today is often partial.
 **3. MCP Inspector — poke individual tools in a browser.**
 
 ```sh
-uv run mcp dev src/garmin_mcp/server.py:mcp
+uv run mcp dev src/garmin_mcp/server.py:mcp --with-editable .
 ```
 
 Opens a UI where you can list tools, read their schemas, and call them with
-your own arguments. Needs `npx`.
+your own arguments. Needs `npx`. The `--with-editable .` matters: the Inspector
+runs the server in its own environment, which otherwise lacks `garminconnect`.
 
 **4. End to end in Claude Code.**
 

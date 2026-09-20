@@ -7,7 +7,7 @@ license = "MIT"
 license-files = ["LICENSE"]
 keywords = ["garmin", "mcp", "health", "fitness", "sleep"]
 authors = [
-    { name = "Shahed", email = "alchemistshahed@gmail.com" }
+    { name = "Shahed", email = "alchemist-s@users.noreply.github.com" }
 ]
 requires-python = ">=3.11"
 dependencies = [

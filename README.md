@@ -101,6 +101,14 @@ today; omitting a range means the last seven days.
 
 | Tool | What it returns |
 | --- | --- |
+| `garmin_training_history` | Weekly volume, longest run and pace over N weeks — the input for a plan |
+| `garmin_create_workout` | Build a structured session (intervals, pace targets) and optionally schedule it |
+| `garmin_schedule_workout` | Put an existing workout on a date |
+| `garmin_scheduled_workouts` | What's on the calendar this month |
+| `garmin_unschedule_workout` | Take a session off the calendar, keeping the workout |
+| `garmin_delete_workout` | Delete a saved workout (plans only — never recorded activities) |
+| `garmin_list_workouts` | Workouts saved on the account |
+| `garmin_export_activities` | Activities in a date range as CSV |
 | `garmin_briefing` | Sleep, HRV, stress, readiness, Body Battery and daily totals in one call |
 | `garmin_whoami` | Account name and unit preferences |
 | `garmin_devices` | Registered devices and last sync |
@@ -166,12 +174,43 @@ those are Forerunner/Fenix features. `zonetwo check` reports that as `none`
 rather than `ok`, so you can tell "my watch doesn't do this" from "this is
 broken".
 
-### Writes
+### What it may change
 
-Read-only by default. Setting `GARMIN_MCP_ENABLE_WRITES=1` adds
-`garmin_rename_activity`, `garmin_add_weight` and `garmin_add_hydration`.
-Nothing deletes, by design — these tools act on a real health record that syncs
-back to the watch.
+Two kinds of write, with different rules, because they carry different risk.
+
+**Plans** — creating, scheduling and unscheduling workouts — are always
+available. They are additive, reversible, and the reason the server exists.
+Deleting a saved *workout* is allowed for the same reason: a plan is a draft.
+
+**Records** — renaming an activity, logging weight or hydration — are opt-in
+via `ZONETWO_ENABLE_WRITES=1`, because they edit history rather than intent.
+
+**Recorded activities can never be deleted.** No such tool exists at any
+setting. Plans are drafts; history is history.
+
+### Writing workouts
+
+`garmin_create_workout` takes steps a model can plausibly write, and translates
+them into Garmin's nested format:
+
+```json
+{
+  "name": "6 x 800m",
+  "steps": [
+    {"kind": "warmup", "length": "10min"},
+    {"repeat": 6, "steps": [
+      {"kind": "interval", "length": "800m", "pace": "4:30-4:20"},
+      {"kind": "recovery", "length": "90s"}
+    ]},
+    {"kind": "cooldown", "length": "10min"}
+  ],
+  "schedule_date": "2026-09-25"
+}
+```
+
+Lengths are distances (`800m`, `5km`, `3mi`) or times (`10min`, `90s`, `1h`);
+`min` is parsed before `m`, so a ten minute warmup is never ten metres. Paces
+are minutes per kilometre and become the speed bands Garmin expects.
 
 ## Privacy
 

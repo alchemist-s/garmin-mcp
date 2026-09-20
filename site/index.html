@@ -3,56 +3,53 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Zone Two — your training log, in conversation</title>
-<meta name="description" content="Ask Claude about your sleep, recovery and training. Zone Two reads your own Garmin Connect data, on your own computer.">
+<title>Zone Two — training plans from your own running history</title>
+<meta name="description" content="Claude reads your Garmin running history, builds a plan that fits it, and puts every session on your watch.">
 <meta property="og:title" content="Zone Two">
-<meta property="og:description" content="Your training log, in conversation. Ask Claude about your sleep, recovery and runs.">
+<meta property="og:description" content="Training plans built from your own running history, scheduled straight to your watch.">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#146b52">
+<meta name="theme-color" content="#b4522a">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-
 <div class="wrap">
+
   <header class="site-head">
     <a class="brand" href="/">
       <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-opacity=".18" stroke-width="2.5"/>
-        <path d="M16 2a14 14 0 0 1 12.12 7" stroke="#146b52" stroke-width="2.5" stroke-linecap="round"/>
-        <path d="M8 17.5h3.2l2-4.6 2.6 8 2.4-5.4 1.5 2h4.3" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-opacity=".2" stroke-width="2.5"/>
+        <path d="M16 2a14 14 0 0 1 12.12 7" stroke="#b4522a" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M8 17.5h3.2l2-4.6 2.6 8 2.4-5.4 1.5 2h4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <span>Zone Two</span>
     </a>
     <nav class="head-links">
+      <a href="#features">Features</a>
       <a href="#install">Install</a>
-      <a href="#privacy-summary">Privacy</a>
-      <a href="https://github.com/alchemist-s/zonetwo">Source</a>
+      <a href="/privacy">Privacy</a>
     </nav>
   </header>
 
   <main>
     <div class="hero">
-      <h1>Your training log, in conversation.</h1>
-      <p class="lede">Ask Claude how you slept, whether you're recovered, and how
-      that run actually went. Zone Two reads your own Garmin Connect data —
-      on your computer, not ours.</p>
-
+      <h1>A training plan built from the running you actually did.</h1>
+      <p class="lede">Zone Two gives Claude your Garmin history. Ask for a half
+      marathon plan and you get one shaped around your real mileage and real
+      paces — then every session lands on your watch.</p>
       <div class="cta-row">
         <a class="cta" href="https://github.com/alchemist-s/zonetwo/releases/latest/download/zonetwo.mcpb">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M8 1v9m0 0 3.5-3.5M8 10 4.5 6.5M2 12.5v1A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5v-1"
-                  stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 1v9m0 0 3.5-3.5M8 10 4.5 6.5M2 12.5v1A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5v-1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           Add to Claude Desktop
         </a>
-        <a class="ghost" href="https://github.com/alchemist-s/zonetwo">Read the source →</a>
+        <a class="ghost" href="#features">See what it does →</a>
       </div>
-      <p class="cta-sub">Free and open source. Download one file and open it — no Python, no terminal, no config.</p>
+      <p class="cta-sub">Free and open source. One file to download — no setup, no terminal, nothing to configure.</p>
     </div>
 
-    <div class="demo" role="img" aria-label="Example conversation with Zone Two">
+    <div class="demo" role="img" aria-label="Example conversation: building a training plan from past running history">
       <div class="demo-bar">
         <span class="dot"></span><span class="dot"></span><span class="dot"></span>
         <span class="demo-title">Claude</span>
@@ -60,84 +57,107 @@
       <div class="demo-body">
         <div class="msg you">
           <span class="who">You</span>
-          <div class="said"><p>How did I sleep, and am I good for intervals today?</p></div>
+          <div class="said"><p>Based on my past training, build me a half marathon plan.</p></div>
         </div>
         <div class="msg">
           <span class="who">C</span>
           <div class="said">
-            <p>You slept <span class="metric">7h 32m</span> with a sleep score of
-            <span class="metric">82</span> — about an hour more deep sleep than your weekly average.</p>
-            <p>Overnight HRV came in at <span class="metric">43&nbsp;ms</span>, right on your
-            baseline, and Body Battery recharged to <span class="metric">83</span>. Resting
-            heart rate was <span class="metric">48&nbsp;bpm</span>, two below your seven-day average.</p>
-            <p>Nothing in the numbers argues against intervals. Your last hard session
-            was Tuesday, so you've had two easy days since.</p>
+            <p>Looking at your last twelve months: you built to a <span class="metric">48 km</span>
+            peak week in late January with a <span class="metric">28 km</span> long run, then ran a
+            marathon on 1 March in <span class="metric">4:40</span> at <span class="metric">6:38/km</span>.
+            Since then you've averaged under <span class="metric">20 km</span> a week, and the last
+            month is closer to <span class="metric">10</span>.</p>
+            <p>So this isn't a taper — it's a rebuild. Twelve weeks, starting at 20 km and
+            growing about 10% a week, with your easy pace set at 6:45/km rather than the
+            6:15 you were holding in January. Here's week one:</p>
+            <div class="plan">
+              <div><span class="day">Tue</span><span>Easy 5 km @ 6:45/km</span></div>
+              <div><span class="day">Thu</span><span>6 × 400 m @ 5:30/km, 90 s jog</span></div>
+              <div><span class="day">Sat</span><span>Easy 5 km @ 6:45/km</span></div>
+              <div><span class="day">Sun</span><span>Long run 9 km @ 7:00/km</span></div>
+            </div>
+            <p class="pill">✓ All four scheduled on your Venu 3 through 30 September</p>
           </div>
         </div>
         <div class="msg you">
           <span class="who">You</span>
-          <div class="said"><p>How was Saturday's run?</p></div>
+          <div class="said"><p>I'm travelling Thursday — move it and make it easier.</p></div>
         </div>
         <div class="msg">
           <span class="who">C</span>
           <div class="said">
-            <p><span class="metric">10.0 km</span> in <span class="metric">52:14</span>,
-            averaging <span class="metric">5:14/km</span> at <span class="metric">148 bpm</span>.
-            Your splits were even until kilometre 8, then dropped to 4:58 and 4:51 —
-            a negative split finish.</p>
+            <p>Moved to Friday and swapped the intervals for an easy <span class="metric">5 km</span>
+            — you'll have had two rest days by then, so the session would have been wasted anyway.
+            Updated on your watch.</p>
           </div>
         </div>
       </div>
     </div>
 
-    <section>
-      <h2>What you can ask</h2>
-      <div class="grid">
-        <div class="card"><h3>Sleep</h3><p>Stages, sleep score, overnight SpO2 and breathing rate.</p></div>
-        <div class="card"><h3>Recovery</h3><p>HRV against your baseline, Body Battery, stress, resting heart rate.</p></div>
-        <div class="card"><h3>Activities</h3><p>Pace, per-kilometre splits, heart rate, power, cadence, elevation.</p></div>
-        <div class="card"><h3>Trends</h3><p>Steps, intensity minutes and training load over any date range.</p></div>
+    <section id="features">
+      <h2>What it does</h2>
+      <p class="sec-lede">Reading the data is the easy part. The point is what Claude can do with it.</p>
+      <div class="features">
+        <div class="feature">
+          <div class="ic"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 14.5V7m4 7.5v-11m4 11V9m4 5.5V4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <h3>Plans from your history</h3>
+          <p>Half or full marathon, 10K, or a rebuild after time off — shaped around the weeks you actually ran, not a template.</p>
+        </div>
+        <div class="feature">
+          <div class="ic"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="3.5" width="13" height="12" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M6 1.5v4M12 1.5v4M2.5 7.5h13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <h3>Sessions on your watch</h3>
+          <p>Each workout is created as a structured session with pace targets and intervals, scheduled to the day. Change your mind and it reschedules.</p>
+        </div>
+        <div class="feature">
+          <div class="ic"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v9m0 0 3.5-3.5M9 11 5.5 7.5M3 13v1.5A1.5 1.5 0 0 0 4.5 16h9a1.5 1.5 0 0 0 1.5-1.5V13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Export that actually works</h3>
+          <p>Ask for your running history as a spreadsheet and get one — every run, distance, pace and heart rate. No export queue, no waiting for an email.</p>
+        </div>
+        <div class="feature">
+          <div class="ic"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 10.5h3l2-5 2.6 9L12 8l1.4 2.5H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Should I run today?</h3>
+          <p>Overnight HRV against your baseline, sleep, Body Battery and recent load — read together, with a straight answer.</p>
+        </div>
+        <div class="feature">
+          <div class="ic"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.8"/><path d="M9 5.5V9l2.5 1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Make sense of a block</h3>
+          <p>Why March went well and June didn't. Whether your long runs follow bad sleep. Questions a chart can't answer.</p>
+        </div>
+        <div class="feature">
+          <div class="ic"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 9.5 7.5 13 14 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Everything else</h3>
+          <p>Sleep stages, stress, Body Battery, weigh-ins, splits, personal records — all of it available when you ask.</p>
+        </div>
       </div>
     </section>
 
     <section id="install">
       <h2>Three steps, once</h2>
+      <p class="sec-lede">No Python, no terminal, no configuration files.</p>
       <ol class="steps">
-        <li><strong>Download and open</strong><p>Claude Desktop recognises the file and shows an install dialog.</p></li>
+        <li><strong>Download and open</strong><p>Claude Desktop recognises the file and shows an install window.</p></li>
         <li><strong>Sign in to Garmin</strong><p>Your email and password. The password is used once, to get an access token that stays on your computer.</p></li>
-        <li><strong>Ask it something</strong><p>If you use two-step verification, Garmin emails a code — paste it into the chat. You won't be asked again for about a year.</p></li>
+        <li><strong>Ask for a plan</strong><p>If you use two-step verification, Garmin emails a code — paste it into the chat. You won't be asked again for about a year.</p></li>
       </ol>
     </section>
 
-    <section id="privacy-summary">
+    <section>
       <h2>Where your data goes</h2>
       <div class="facts">
-        <div class="fact">
-          <h3>Straight to Garmin</h3>
-          <p>Requests go from your computer to Garmin directly. There is no server in between, no account to create, and no analytics of any kind.</p>
-        </div>
-        <div class="fact">
-          <h3>Your password is used once</h3>
-          <p>It's exchanged for an access token stored on your machine, and never written to disk or logged by Zone Two.</p>
-        </div>
-        <div class="fact">
-          <h3>It reads; it can't delete</h3>
-          <p>Read-only unless you opt in at install. Even then it can only rename an activity or log a weight — no delete function exists in it.</p>
-        </div>
-        <div class="fact">
-          <h3>Your questions reach Claude</h3>
-          <p>Anything you ask about becomes part of your conversation, which Anthropic processes. That's how Claude works, and worth knowing with health data.</p>
-        </div>
+        <div class="fact"><h3>Straight to Garmin</h3><p>Requests go from your computer to Garmin directly. No server in between, no account to create, no analytics.</p></div>
+        <div class="fact"><h3>Your password is used once</h3><p>Exchanged for an access token kept on your machine. Never written to disk or logged by Zone Two.</p></div>
+        <div class="fact"><h3>Plans can change; history can't</h3><p>It creates and reschedules workouts freely. It can never delete a recorded activity — there is no such function in it.</p></div>
+        <div class="fact"><h3>Your questions reach Claude</h3><p>Whatever you ask about becomes part of your conversation, which Anthropic processes. Worth knowing with health data.</p></div>
       </div>
-      <p style="margin-top:1.5rem"><a href="/privacy">Read the full privacy policy →</a></p>
+      <p style="margin-top:1.6rem"><a href="/privacy">Read the full privacy policy →</a></p>
     </section>
 
     <section>
       <h2>Worth knowing first</h2>
       <div class="note">
-        <p><strong>It uses Garmin's private app interface.</strong> Garmin's official API requires a commercial partner agreement, so Zone Two talks to the same interface the Garmin Connect app uses. It isn't supported by Garmin and could stop working if they change it.</p>
-        <p><strong>What you get depends on your watch.</strong> Garmin only computes training readiness, training status and VO2 max on some models. On the others those come back empty — that's the device, not a fault.</p>
-        <p><strong>It's one person's open-source project.</strong> Provided as-is, and best read as a way to talk to your own data rather than a product with a support desk.</p>
+        <p><strong>A plan from Claude is not a coach.</strong> It's a sensible plan built from your own numbers, and it doesn't know about your knee, your work trip or how you actually felt on Tuesday. Treat it as a well-informed starting point you adjust.</p>
+        <p><strong>It uses Garmin's private app interface.</strong> Garmin's official API needs a commercial partner agreement, so Zone Two talks to the same interface the Garmin Connect app does. It isn't supported by Garmin and could stop working if they change it.</p>
+        <p><strong>What you get depends on your watch.</strong> Some models don't compute training readiness or VO2 max. Your activity history is always there, which is what plans are built from.</p>
       </div>
     </section>
   </main>
@@ -150,13 +170,13 @@
         <a href="https://github.com/alchemist-s/zonetwo/releases">Releases</a>
         <a href="https://github.com/alchemist-s/zonetwo/issues">Report a problem</a>
       </div>
-      <div>MIT licensed</div>
+      <div>MIT licensed · open source</div>
     </div>
-    <p class="disclaimer">Zone Two is an independent open-source project. It is not affiliated
-    with, endorsed by, or sponsored by Garmin. Garmin and Garmin Connect are trademarks of
-    Garmin Ltd., used here only to describe what this software connects to.</p>
+    <p class="disclaimer">Zone Two is an independent open-source project. It is not affiliated with,
+    endorsed by, or sponsored by Garmin. Garmin, Garmin Connect and Venu are trademarks of Garmin Ltd.,
+    used here only to describe what this software connects to.</p>
   </footer>
-</div>
 
+</div>
 </body>
 </html>

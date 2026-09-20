@@ -2,9 +2,9 @@
   "manifest_version": "0.4",
   "name": "zonetwo",
   "display_name": "Zone Two",
-  "version": "0.3.0",
-  "description": "Your training log, in conversation. Works with Garmin Connect.",
-  "long_description": "Zone Two reads your own Garmin Connect account so you can ask about it in plain language: sleep stages and score, overnight HRV against your baseline, Body Battery, stress, steps, weigh-ins, and activities with per-kilometre splits. It also answers \"how am I doing today?\" in a single call.\n\nSign in once. Enter your Garmin email and password below; if your account uses two-step verification, Garmin emails you a code and Claude asks for it in the conversation. After that a saved token keeps you signed in for about a year.\n\nEverything runs on your own computer. Requests go straight to Garmin \u2014 there is no server in between and no analytics of any kind. Zone Two is not affiliated with or endorsed by Garmin; it uses the same private interface the Garmin Connect app uses, because Garmin's official API requires a commercial partner agreement.",
+  "version": "0.4.0",
+  "description": "Turn your running history into a training plan, on your watch. Works with Garmin Connect.",
+  "long_description": "Zone Two reads your own Garmin Connect history so Claude can do something useful with it: look at what you have actually been running, design a plan that fits it, and put each session on your watch as a structured workout.\n\nAsk it to build a half marathon plan from your last six months, to tell you whether you are ready for intervals today, or to export your running history as a spreadsheet \u2014 the export Garmin makes awkward.\n\nSign in once. Enter your Garmin email and password below; if your account uses two-step verification, Garmin emails a code and Claude asks for it in the conversation. After that a saved token keeps you signed in for about a year.\n\nEverything runs on your own computer. Requests go straight to Garmin \u2014 there is no server in between and no analytics of any kind. Zone Two can create and schedule workouts, and it can never delete a recorded activity. It is not affiliated with or endorsed by Garmin.",
   "author": {
     "name": "Shahed",
     "url": "https://github.com/alchemist-s"
@@ -33,7 +33,7 @@
       "env": {
         "GARMIN_EMAIL": "${user_config.email}",
         "GARMIN_PASSWORD": "${user_config.password}",
-        "GARMIN_MCP_ENABLE_WRITES": "${user_config.enable_writes}"
+        "ZONETWO_ENABLE_WRITES": "${user_config.enable_record_edits}"
       }
     }
   },
@@ -51,10 +51,10 @@
       "sensitive": true,
       "required": true
     },
-    "enable_writes": {
+    "enable_record_edits": {
       "type": "boolean",
-      "title": "Allow changes to my Garmin data",
-      "description": "Off by default. When on, Claude may rename activities and log weight or hydration. Nothing can be deleted either way.",
+      "title": "Let Claude edit my Garmin records",
+      "description": "Off by default. Scheduling workouts always works; this adds renaming activities and logging weight or hydration. Recorded activities can never be deleted either way.",
       "default": false,
       "required": false
     }

@@ -19,6 +19,7 @@ import anyio.to_thread
 from garminconnect import (
     Garmin,
     GarminConnectAuthenticationError,
+    GarminConnectConnectionError,
     GarminConnectTooManyRequestsError,
 )
 
@@ -187,7 +188,9 @@ def _invoke(method: str, args: tuple, kwargs: dict):
         with _slots:
             try:
                 return getattr(client(), method)(*args, **kwargs)
-            except GarminConnectTooManyRequestsError:
+            except (GarminConnectTooManyRequestsError, GarminConnectConnectionError):
+                # Both are worth another go: a 429 needs time, and Garmin reads
+                # time out on wide date ranges often enough to be routine.
                 if attempt == RETRY_ATTEMPTS:
                     raise
         time.sleep(delay + random.uniform(0, RETRY_JITTER_S))

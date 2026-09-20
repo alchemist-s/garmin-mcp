@@ -121,3 +121,15 @@ async def test_concurrent_calls_are_capped(monkeypatch):
             tg.start_soon(connection.call, "get_sleep_data", "2026-03-04")
 
     assert state["peak"] <= connection.MAX_CONCURRENT_CALLS
+
+
+@pytest.mark.anyio
+async def test_transient_connection_errors_are_retried(monkeypatch):
+    """Garmin reads time out on wide date ranges; that should not be fatal."""
+    from garminconnect import GarminConnectConnectionError
+
+    client = FlakyClient(failures=1, error=GarminConnectConnectionError("read timed out"))
+    monkeypatch.setattr(connection, "client", lambda: client)
+
+    assert await connection.call("get_sleep_data", "2026-03-04") == {"ok": "2026-03-04"}
+    assert client.attempts == 2

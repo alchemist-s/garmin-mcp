@@ -7,6 +7,7 @@ on a real health record that syncs back to the watch.
 from __future__ import annotations
 
 import os
+from datetime import date, timedelta
 from functools import partial, wraps
 from importlib.metadata import version
 from typing import Any
@@ -22,6 +23,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
 
 from . import connection
+from .workouts import build_running_workout
 from .shaping import (
     add_pace,
     cap,
@@ -35,7 +37,13 @@ from .shaping import (
 )
 
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=True)
-WRITES_ENABLED = os.getenv("GARMIN_MCP_ENABLE_WRITES", "").lower() in {"1", "true", "yes"}
+MAX_EXPORT_CHARS = 200_000
+# Two different kinds of write, with different risk, so different rules:
+#   Plans  — creating and scheduling workouts. Additive, reversible, and the
+#            point of the product, so always available.
+#   Record — renaming activities, logging weight. Edits history, so opt-in.
+# Deleting a recorded activity is not offered at all, under any setting.
+RECORD_WRITES_ENABLED = os.getenv("ZONETWO_ENABLE_WRITES", "").lower() in {"1", "true", "yes"}
 
 mcp = MCPServer(
     name="garmin",
@@ -764,6 +772,208 @@ async def garmin_api_get(path: str) -> Any:
     return cap(prune(data))
 
 
+# --- training history ----------------------------------------------------
+
+
+@tool
+async def garmin_training_history(weeks: int = 12, activity_type: str = "running") -> dict[str, Any]:
+    """Weekly training volume over recent weeks — the input for writing a plan.
+
+    Returns one row per week (distance, sessions, longest run, average pace)
+    plus overall totals, in a single call. Use this before designing a plan
+    rather than fetching activities one range at a time.
+    """
+    if weeks < 1 or weeks > 104:
+        raise ValueError("weeks must be between 1 and 104.")
+    end = date.today()
+    start = end - timedelta(weeks=weeks)
+    data = await connection.call(
+        "get_activities_by_date", start.isoformat(), end.isoformat(), activity_type or None
+    )
+
+    buckets: dict[str, dict[str, Any]] = {}
+    for activity in data or []:
+        stamp = (activity.get("startTimeLocal") or "")[:10]
+        if not stamp:
+            continue
+        try:
+            day = date.fromisoformat(stamp)
+        except ValueError:
+            continue
+        monday = (day - timedelta(days=day.weekday())).isoformat()
+        week = buckets.setdefault(
+            monday,
+            {"weekStarting": monday, "sessions": 0, "distanceKm": 0.0, "longestRunKm": 0.0,
+             "movingSeconds": 0.0},
+        )
+        metres = activity.get("distance") or 0
+        week["sessions"] += 1
+        week["distanceKm"] = round(week["distanceKm"] + metres / 1000, 2)
+        week["longestRunKm"] = round(max(week["longestRunKm"], metres / 1000), 2)
+        week["movingSeconds"] += activity.get("movingDuration") or activity.get("duration") or 0
+
+    rows = []
+    for week in sorted(buckets.values(), key=lambda w: w["weekStarting"]):
+        seconds = week.pop("movingSeconds")
+        if week["distanceKm"] > 0 and seconds > 0:
+            pace = (seconds / 60) / week["distanceKm"]
+            minutes, fraction = divmod(pace, 1)
+            week["averagePace"] = f"{int(minutes)}:{round(fraction * 60):02d} min/km"
+        rows.append(week)
+
+    total = round(sum(r["distanceKm"] for r in rows), 1)
+    return cap(
+        {
+            "from": start.isoformat(),
+            "to": end.isoformat(),
+            "activityType": activity_type,
+            "weeks": rows,
+            "totals": {
+                "distanceKm": total,
+                "sessions": sum(r["sessions"] for r in rows),
+                "weeksWithTraining": len(rows),
+                "averageWeeklyKm": round(total / weeks, 1),
+                "longestRunKm": max((r["longestRunKm"] for r in rows), default=0),
+            },
+        }
+    )
+
+
+@tool
+async def garmin_export_activities(
+    start: str | None = None, end: str | None = None, activity_type: str | None = None
+) -> str:
+    """Export activities in a date range as CSV — the export Garmin makes awkward.
+
+    One header row then one row per activity, newest last. Narrow the range if
+    the response comes back truncated.
+    """
+    first, last = date_range(start, end, default_days=365)
+    data = await connection.call("get_activities_by_date", first, last, activity_type)
+    columns = [
+        "date", "name", "type", "distance_km", "duration_min", "pace_min_per_km",
+        "avg_hr", "max_hr", "elevation_gain_m", "calories",
+    ]
+    lines = [",".join(columns)]
+    for activity in data or []:
+        summary = summarise_activity(activity)
+        metres = summary.get("distanceMeters") or 0
+        seconds = summary.get("movingDurationSeconds") or summary.get("durationSeconds") or 0
+        name = str(summary.get("activityName", "")).replace('"', "'")
+        lines.append(
+            ",".join(
+                [
+                    str(summary.get("startTimeLocal", ""))[:10],
+                    f'"{name}"',
+                    str(summary.get("activityType", "")),
+                    f"{metres / 1000:.2f}" if metres else "",
+                    f"{seconds / 60:.1f}" if seconds else "",
+                    str(summary.get("pace", "")).replace(" min/km", ""),
+                    str(summary.get("averageHeartRateBpm", "") or ""),
+                    str(summary.get("maxHeartRateBpm", "") or ""),
+                    str(summary.get("elevationGainMeters", "") or ""),
+                    str(summary.get("caloriesKcal", "") or ""),
+                ]
+            )
+        )
+    body = "\n".join(lines)
+    if len(body) > MAX_EXPORT_CHARS:
+        raise ValueError(
+            f"That range produced {len(data or [])} activities, too large to return at once. "
+            "Export a narrower date range."
+        )
+    return body
+
+
+# --- plans (always available) --------------------------------------------
+
+
+@write_tool
+async def garmin_create_workout(
+    name: str,
+    steps: list[dict[str, Any]],
+    schedule_date: str | None = None,
+    description: str | None = None,
+) -> dict[str, Any]:
+    """Create a structured running workout on Garmin, optionally scheduling it.
+
+    Steps are plain objects, in order. Each needs a ``kind`` (warmup, run,
+    interval, recovery, rest, cooldown) and a ``length`` — a distance like
+    "800m", "5km" or a time like "10min", "90s". Optionally add ``pace``
+    ("4:30" or a range "4:30-4:20", minutes per kilometre) or
+    ``heart_rate_zone`` (1-5), and a ``note``.
+
+    Repeats nest: ``{"repeat": 6, "steps": [{"kind": "interval", "length":
+    "800m", "pace": "4:30-4:20"}, {"kind": "recovery", "length": "90s"}]}``.
+
+    Once scheduled it appears on the watch on that date.
+    """
+    workout = build_running_workout(name, steps, description)
+    created = await connection.call("upload_running_workout", workout)
+    workout_id = (created or {}).get("workoutId")
+    result: dict[str, Any] = {
+        "workoutId": workout_id,
+        "workoutName": name,
+        "estimatedMinutes": round((workout.estimatedDurationInSecs or 0) / 60),
+        "status": "created",
+    }
+    if schedule_date and workout_id:
+        cdate = parse_date(schedule_date)
+        await connection.call("schedule_workout", workout_id, cdate)
+        result["scheduledFor"] = cdate
+        result["status"] = "created and scheduled"
+    return result
+
+
+@write_tool
+async def garmin_schedule_workout(workout_id: str, date: str) -> dict[str, Any]:
+    """Put an existing workout on the calendar for a given date."""
+    cdate = parse_date(date)
+    await connection.call("schedule_workout", workout_id, cdate)
+    return {"workoutId": workout_id, "scheduledFor": cdate, "status": "scheduled"}
+
+
+@tool
+async def garmin_list_workouts(limit: int = 25) -> list[dict[str, Any]]:
+    """List the workouts saved on the Garmin account, newest first."""
+    data = await connection.call("get_workouts", 0, limit)
+    return [
+        prune(
+            pick(w, "workoutId", "workoutName", "description", "updatedDate", "estimatedDurationInSecs")
+            | {"sport": ((w.get("sportType") or {}).get("sportTypeKey"))}
+        )
+        for w in data or []
+    ]
+
+
+@tool
+async def garmin_scheduled_workouts(year: int | None = None, month: int | None = None) -> Any:
+    """List workouts scheduled in a given month (defaults to the current one)."""
+    today = date.today()
+    data = await connection.call("get_scheduled_workouts", year or today.year, month or today.month)
+    items = data if isinstance(data, list) else (data or {}).get("calendarItems") or []
+    return cap(
+        [
+            prune(pick(i, "id", "date", "title", "workoutId", "itemType", "completed"))
+            for i in items
+        ]
+    )
+
+
+@write_tool
+async def garmin_unschedule_workout(scheduled_workout_id: str) -> dict[str, Any]:
+    """Remove a scheduled workout from the calendar. The workout itself is kept."""
+    await connection.call("unschedule_workout", scheduled_workout_id)
+    return {"scheduledWorkoutId": scheduled_workout_id, "status": "unscheduled"}
+
+
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=True))
+async def garmin_delete_workout(workout_id: str) -> dict[str, Any]:
+    """Delete a saved workout. Only affects plans — recorded activities cannot be deleted."""
+    await connection.call("delete_workout", workout_id)
+    return {"workoutId": workout_id, "status": "deleted"}
+
+
 # --- sign-in -------------------------------------------------------------
 
 
@@ -781,7 +991,7 @@ async def garmin_submit_mfa_code(code: str) -> dict[str, Any]:
 
 # --- writes (opt-in) -----------------------------------------------------
 
-if WRITES_ENABLED:
+if RECORD_WRITES_ENABLED:
 
     @write_tool
     async def garmin_rename_activity(activity_id: str, name: str) -> dict[str, Any]:

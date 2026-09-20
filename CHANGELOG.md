@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.4.0
+
+Plans, not just readouts.
+
+- `garmin_create_workout` builds structured sessions — intervals, repeats, pace
+  or heart-rate targets — and schedules them onto the watch. Steps are written
+  in plain terms and translated into Garmin's nested format, because no model
+  should be hand-writing four nested dictionaries per step.
+- `garmin_training_history` returns weekly volume, longest run and pace over N
+  weeks in one call, so writing a plan does not mean fetching runs one range at
+  a time.
+- `garmin_export_activities` returns a date range as CSV.
+- Scheduling and unscheduling workouts, and deleting saved workouts, are now
+  always available: plans are drafts. Editing records stays opt-in, renamed to
+  `ZONETWO_ENABLE_WRITES`. Recorded activities still cannot be deleted at all.
+- Transient connection errors are retried alongside 429s — Garmin reads time
+  out on wide date ranges often enough to be routine.
+- Rebuilt the website around building a plan rather than reading a number.
+
 ## 0.3.0
 
 Renamed to **Zone Two**. The package, the CLI command and the bundle are now

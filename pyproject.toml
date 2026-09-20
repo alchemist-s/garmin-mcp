@@ -1,6 +1,6 @@
 [project]
 name = "zonetwo"
-version = "0.3.0"
+version = "0.4.0"
 description = "Zone Two — your training log in conversation. Reads Garmin Connect health, sleep, training and activity data."
 readme = "README.md"
 license = "MIT"

@@ -33,8 +33,14 @@ def test_the_password_field_is_marked_sensitive():
     assert _manifest()["user_config"]["password"]["sensitive"] is True
 
 
-def test_writes_are_off_by_default_in_the_bundle():
-    assert _manifest()["user_config"]["enable_writes"]["default"] is False
+def test_record_edits_are_off_by_default_in_the_bundle():
+    """Scheduling workouts is always on; editing recorded history is not."""
+    assert _manifest()["user_config"]["enable_record_edits"]["default"] is False
+
+
+def test_the_bundle_wires_the_write_flag_the_server_reads():
+    env = _manifest()["server"]["mcp_config"]["env"]
+    assert env["ZONETWO_ENABLE_WRITES"] == "${user_config.enable_record_edits}"
 
 
 def test_entry_point_exists_and_is_listed():

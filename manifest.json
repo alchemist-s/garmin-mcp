@@ -2,14 +2,14 @@
   "manifest_version": "0.4",
   "name": "garmin-connect",
   "display_name": "Garmin Connect",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Ask about your Garmin sleep, HRV, training and activity data.",
   "long_description": "Reads health, sleep, training and activity data from your own Garmin Connect account: sleep stages and score, overnight HRV, Body Battery, stress, SpO2, steps, weigh-ins, activities with per-lap splits, and a one-call morning briefing.\n\nSign-in happens once. Enter your Garmin email and password below; if your account uses two-step verification, Garmin emails you a code and Claude will ask for it in the conversation. After that a saved token keeps you signed in for about a year.\n\nThis uses the same private API the Garmin Connect app uses, because Garmin's official API is only issued under a commercial partner agreement. It is unsupported by Garmin and reads your data only.",
   "author": {
     "name": "Shahed",
     "url": "https://github.com/alchemist-s"
   },
-  "homepage": "https://github.com/alchemist-s/garmin-mcp",
+  "homepage": "https://garmin-mcp-sepia.vercel.app",
   "documentation": "https://github.com/alchemist-s/garmin-mcp#readme",
   "support": "https://github.com/alchemist-s/garmin-mcp/issues",
   "keywords": [
@@ -67,6 +67,6 @@
     ]
   },
   "privacy_policies": [
-    "https://github.com/alchemist-s/garmin-mcp#privacy"
+    "https://garmin-mcp-sepia.vercel.app/privacy"
   ]
 }

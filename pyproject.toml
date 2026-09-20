@@ -1,6 +1,6 @@
 [project]
 name = "garmin-mcp"
-version = "0.2.0"
+version = "0.2.1"
 description = "MCP server for Garmin Connect health, sleep, training and activity data"
 readme = "README.md"
 license = "MIT"

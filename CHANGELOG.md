@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+- Point the bundle's privacy policy at the published site.
+
 ## 0.2.0
 
 **Breaking:** response fields now carry their unit in the name.

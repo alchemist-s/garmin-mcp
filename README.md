@@ -21,8 +21,9 @@ just hang.
 
 ## Install (Claude Desktop)
 
-Download **garmin-connect.mcpb** from the
-[latest release](https://github.com/alchemist-s/garmin-mcp/releases/latest) and
+Download **garmin-connect.mcpb** from
+[the website](https://garmin-mcp-sepia.vercel.app) or the
+[latest release](https://github.com/alchemist-s/garmin-mcp/releases/latest), and
 open it. Claude Desktop shows an install dialog asking for your Garmin email
 and password. Nothing else is needed — no Python, no terminal, no config files.
 

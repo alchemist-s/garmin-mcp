@@ -12,6 +12,7 @@ from importlib.metadata import version
 from typing import Any
 
 import anyio
+import anyio.to_thread
 from garminconnect import (
     GarminConnectConnectionError,
     GarminConnectTooManyRequestsError,
@@ -62,7 +63,12 @@ def explain_failures(fn):
     async def wrapper(*args, **kwargs):
         try:
             return await fn(*args, **kwargs)
-        except (connection.NotLoggedIn, ValueError) as exc:
+        except (
+            connection.NotLoggedIn,
+            connection.MFARequired,
+            connection.NoPendingLogin,
+            ValueError,
+        ) as exc:
             raise ToolError(str(exc)) from exc
         except GarminConnectTooManyRequestsError as exc:
             raise ToolError(
@@ -756,6 +762,21 @@ async def garmin_api_get(path: str) -> Any:
         raise ValueError("path must start with '/'")
     data = await connection.call("connectapi", path)
     return cap(prune(data))
+
+
+# --- sign-in -------------------------------------------------------------
+
+
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False))
+async def garmin_submit_mfa_code(code: str) -> dict[str, Any]:
+    """Finish signing in to Garmin with the one-time code it emailed.
+
+    Only needed when a Garmin tool has just reported that a code was sent. The
+    code is valid for 30 minutes; afterwards the saved tokens last about a year
+    and this is not asked for again.
+    """
+    name = await anyio.to_thread.run_sync(connection.submit_mfa_code, code)
+    return {"status": "signed in", "account": name}
 
 
 # --- writes (opt-in) -----------------------------------------------------

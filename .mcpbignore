@@ -1,0 +1,19 @@
+# The host resolves dependencies with uv, so a bundled environment must not ship.
+.venv/
+server/lib/
+server/venv/
+
+.git/
+.github/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.pyc
+dist/
+build/
+*.egg-info/
+
+tests/
+.mcpbignore
+*.mcpb
+.DS_Store

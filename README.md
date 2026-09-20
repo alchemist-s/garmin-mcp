@@ -19,7 +19,23 @@ password and never logs in. That split is deliberate — MFA prompts cannot be
 answered over an MCP stdio connection, so a server that tried to log in would
 just hang.
 
-## Setup
+## Install (Claude Desktop)
+
+Download **garmin-connect.mcpb** from the
+[latest release](https://github.com/alchemist-s/garmin-mcp/releases/latest) and
+open it. Claude Desktop shows an install dialog asking for your Garmin email
+and password. Nothing else is needed — no Python, no terminal, no config files.
+
+If your account uses two-step verification, Garmin emails you a code the first
+time Claude reads your data. Paste it into the conversation and Claude will
+finish signing in. The code lasts 30 minutes, and the saved token then keeps
+you signed in for about a year.
+
+Your password is used once, to obtain that token. It is stored by Claude
+Desktop's own configuration, not by this server, and is only re-used if the
+token is ever rejected.
+
+## Setup (from source)
 
 Requires [uv](https://docs.astral.sh/uv/) and Python 3.11+.
 

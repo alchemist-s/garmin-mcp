@@ -1,8 +1,11 @@
 [project]
 name = "garmin-mcp"
-version = "0.1.0"
+version = "0.2.0"
 description = "MCP server for Garmin Connect health, sleep, training and activity data"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["garmin", "mcp", "health", "fitness", "sleep"]
 authors = [
     { name = "Shahed", email = "alchemistshahed@gmail.com" }
 ]
@@ -11,6 +14,11 @@ dependencies = [
     "garminconnect>=0.3.2",
     "mcp[cli]>=2.0.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/alchemist-s/garmin-mcp"
+Repository = "https://github.com/alchemist-s/garmin-mcp"
+Issues = "https://github.com/alchemist-s/garmin-mcp/issues"
 
 [project.scripts]
 garmin-mcp = "garmin_mcp.cli:main"

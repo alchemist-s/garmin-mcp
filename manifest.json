@@ -1,0 +1,56 @@
+{
+  "manifest_version": "0.4",
+  "name": "garmin-connect",
+  "display_name": "Garmin Connect",
+  "version": "0.2.0",
+  "description": "Ask about your Garmin sleep, HRV, training and activity data.",
+  "long_description": "Reads health, sleep, training and activity data from your own Garmin Connect account: sleep stages and score, overnight HRV, Body Battery, stress, SpO2, steps, weigh-ins, activities with per-lap splits, and a one-call morning briefing.\n\nSign-in happens once. Enter your Garmin email and password below; if your account uses two-step verification, Garmin emails you a code and Claude will ask for it in the conversation. After that a saved token keeps you signed in for about a year.\n\nThis uses the same private API the Garmin Connect app uses, because Garmin's official API is only issued under a commercial partner agreement. It is unsupported by Garmin and reads your data only.",
+  "author": {
+    "name": "Shahed",
+    "url": "https://github.com/alchemist-s"
+  },
+  "homepage": "https://github.com/alchemist-s/garmin-mcp",
+  "documentation": "https://github.com/alchemist-s/garmin-mcp#readme",
+  "support": "https://github.com/alchemist-s/garmin-mcp/issues",
+  "keywords": ["garmin", "health", "fitness", "sleep", "running"],
+  "license": "MIT",
+  "server": {
+    "type": "uv",
+    "entry_point": "entry.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": ["run", "entry.py"],
+      "env": {
+        "GARMIN_EMAIL": "${user_config.email}",
+        "GARMIN_PASSWORD": "${user_config.password}",
+        "GARMIN_MCP_ENABLE_WRITES": "${user_config.enable_writes}"
+      }
+    }
+  },
+  "user_config": {
+    "email": {
+      "type": "string",
+      "title": "Garmin email",
+      "description": "The email address you sign in to Garmin Connect with.",
+      "required": true
+    },
+    "password": {
+      "type": "string",
+      "title": "Garmin password",
+      "description": "Used once to obtain a token, then kept only by Claude's secure storage.",
+      "sensitive": true,
+      "required": true
+    },
+    "enable_writes": {
+      "type": "boolean",
+      "title": "Allow changes to my Garmin data",
+      "description": "Off by default. When on, Claude may rename activities and log weight or hydration. Nothing can be deleted either way.",
+      "default": false,
+      "required": false
+    }
+  },
+  "compatibility": {
+    "claude_desktop": ">=0.10.0",
+    "platforms": ["darwin", "win32", "linux"]
+  }
+}

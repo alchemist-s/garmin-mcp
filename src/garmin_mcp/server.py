@@ -7,10 +7,11 @@ on a real health record that syncs back to the watch.
 from __future__ import annotations
 
 import os
-from functools import wraps
+from functools import partial, wraps
 from importlib.metadata import version
 from typing import Any
 
+import anyio
 from garminconnect import (
     GarminConnectConnectionError,
     GarminConnectTooManyRequestsError,
@@ -21,8 +22,11 @@ from mcp.types import ToolAnnotations
 
 from . import connection
 from .shaping import (
+    add_pace,
     cap,
     date_range,
+    is_thin,
+    label_units,
     parse_date,
     pick,
     prune,
@@ -571,13 +575,14 @@ async def garmin_activity(activity_id: str, raw: bool = False) -> dict[str, Any]
         return cap(prune(data))
     data = await connection.call("get_activity", activity_id)
     summary = (data or {}).get("summaryDTO") or {}
-    return prune(
+    type_key = ((data or {}).get("activityTypeDTO") or {}).get("typeKey")
+    result = prune(
         {
             "activityId": (data or {}).get("activityId"),
             "activityName": (data or {}).get("activityName"),
-            "activityType": ((data or {}).get("activityTypeDTO") or {}).get("typeKey"),
+            "activityType": type_key,
             "description": (data or {}).get("description"),
-            **pick(
+            **label_units(pick(
                 summary,
                 "startTimeLocal",
                 "distance",
@@ -598,9 +603,10 @@ async def garmin_activity(activity_id: str, raw: bool = False) -> dict[str, Any]
                 "trainingEffectLabel",
                 "vO2MaxValue",
                 "averageTemperature",
-            ),
+            )),
         }
     )
+    return add_pace(result, type_key)
 
 
 @tool
@@ -611,19 +617,21 @@ async def garmin_activity_splits(activity_id: str) -> Any:
     return cap(
         [
             prune(
-                pick(
-                    lap,
-                    "lapIndex",
-                    "distance",
-                    "duration",
-                    "movingDuration",
-                    "averageSpeed",
-                    "maxSpeed",
-                    "averageHR",
-                    "maxHR",
-                    "elevationGain",
-                    "elevationLoss",
-                    "calories",
+                label_units(
+                    pick(
+                        lap,
+                        "lapIndex",
+                        "distance",
+                        "duration",
+                        "movingDuration",
+                        "averageSpeed",
+                        "maxSpeed",
+                        "averageHR",
+                        "maxHR",
+                        "elevationGain",
+                        "elevationLoss",
+                        "calories",
+                    )
                 )
             )
             for lap in laps
@@ -666,20 +674,71 @@ async def garmin_weight(start: str | None = None, end: str | None = None) -> Any
             prune(
                 {
                     "date": day.get("summaryDate"),
-                    **pick(
-                        latest,
-                        "weight",
-                        "bmi",
-                        "bodyFat",
-                        "bodyWater",
-                        "boneMass",
-                        "muscleMass",
-                        "sourceType",
+                    **label_units(
+                        pick(
+                            latest,
+                            "weight",
+                            "bmi",
+                            "bodyFat",
+                            "bodyWater",
+                            "boneMass",
+                            "muscleMass",
+                            "sourceType",
+                        )
                     ),
                 }
             )
         )
     return cap(out)
+
+
+# --- composite -----------------------------------------------------------
+
+
+@tool
+async def garmin_briefing(date: str | None = None) -> dict[str, Any]:
+    """Morning snapshot in one call: sleep, HRV, Body Battery, readiness, stress and RHR.
+
+    Fetches each section concurrently so answering "how am I doing today?" costs
+    one round trip instead of six. A section that fails is named in
+    ``sectionsUnavailable`` rather than failing the whole briefing, and a
+    section the device does not record simply reports its own note.
+
+    Returns the numbers only — no training advice. Read readiness, HRV and Body
+    Battery together rather than any one alone.
+    """
+    cdate = parse_date(date)
+
+    sections: dict[str, Any] = {}
+    unavailable: dict[str, str] = {}
+
+    async def section(name: str, fetch) -> None:
+        try:
+            sections[name] = await fetch()
+        except Exception as exc:  # noqa: BLE001 - one bad section must not sink the rest
+            unavailable[name] = str(exc)
+
+    async with anyio.create_task_group() as tg:
+        for name, fetch in (
+            ("sleep", partial(garmin_sleep, cdate)),
+            ("hrv", partial(garmin_hrv, cdate)),
+            ("stress", partial(garmin_stress, cdate)),
+            ("trainingReadiness", partial(garmin_training_readiness, cdate)),
+            ("dailySummary", partial(garmin_daily_summary, cdate)),
+            ("bodyBattery", partial(garmin_body_battery, end=cdate)),
+        ):
+            tg.start_soon(section, name, fetch)
+
+    no_data = sorted(name for name, payload in sections.items() if is_thin(payload))
+    result: dict[str, Any] = {
+        "date": cdate,
+        **{k: v for k, v in sections.items() if k not in no_data},
+    }
+    if no_data:
+        result["sectionsNoData"] = no_data
+    if unavailable:
+        result["sectionsUnavailable"] = unavailable
+    return cap(prune(result))
 
 
 # --- escape hatch --------------------------------------------------------

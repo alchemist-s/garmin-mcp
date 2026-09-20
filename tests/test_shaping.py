@@ -2,7 +2,16 @@ from datetime import date, timedelta
 
 import pytest
 
-from garmin_mcp.shaping import cap, date_range, parse_date, pick, prune, summarise_activity
+from garmin_mcp.shaping import (
+    add_pace,
+    cap,
+    date_range,
+    label_units,
+    parse_date,
+    pick,
+    prune,
+    summarise_activity,
+)
 
 
 def test_parse_date_keywords():
@@ -66,5 +75,42 @@ def test_summarise_activity_flattens_type_key():
     out = summarise_activity(activity)
     assert out["activityType"] == "running"
     assert out["activityId"] == 42
-    assert out["averageHR"] == 148
+    assert out["averageHeartRateBpm"] == 148
+    assert out["distanceMeters"] == 10000.0
     assert "unrelated" not in out
+
+
+def test_label_units_renames_and_converts_grams():
+    out = label_units({"distance": 5000.0, "averageSpeed": 2.75, "weight": 74500.0})
+    assert out == {
+        "distanceMeters": 5000.0,
+        "averageSpeedMetersPerSecond": 2.75,
+        "weightKg": 74.5,
+    }
+
+
+def test_label_units_leaves_unknown_fields_alone():
+    assert label_units({"bmi": 22.1, "sourceType": "INDEX_SCALE"}) == {
+        "bmi": 22.1,
+        "sourceType": "INDEX_SCALE",
+    }
+
+
+def test_add_pace_for_a_run():
+    data = {"distanceMeters": 5000.0, "movingDurationSeconds": 1500.0}
+    assert add_pace(dict(data), "running")["pace"] == "5:00 min/km"
+
+
+def test_add_pace_prefers_moving_time_over_elapsed():
+    data = {
+        "distanceMeters": 5000.0,
+        "movingDurationSeconds": 1500.0,
+        "durationSeconds": 1800.0,
+    }
+    assert add_pace(dict(data), "running")["pace"] == "5:00 min/km"
+
+
+def test_add_pace_skipped_for_cycling_and_missing_data():
+    assert "pace" not in add_pace({"distanceMeters": 5000.0, "durationSeconds": 900.0}, "cycling")
+    assert "pace" not in add_pace({"distanceMeters": 0, "durationSeconds": 900.0}, "running")
+    assert "pace" not in add_pace({"distanceMeters": 5000.0}, "running")

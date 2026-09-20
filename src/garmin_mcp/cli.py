@@ -125,6 +125,7 @@ def _logout(args: argparse.Namespace) -> int:
 # Several depend on device features (HRV, pulse ox), so "no data" is a pass.
 _SIMPLE_CHECKS = [
     "garmin_whoami",
+    "garmin_briefing",
     "garmin_devices",
     "garmin_daily_summary",
     "garmin_sleep",

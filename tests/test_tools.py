@@ -93,7 +93,12 @@ async def test_activities_summarised_and_paged(stub):
     )
     out = await server.garmin_activities(limit=5, offset=10, activity_type="running")
     assert out == [
-        {"activityId": 1, "activityName": "Run", "distance": 5000, "activityType": "running"}
+        {
+            "activityId": 1,
+            "activityName": "Run",
+            "distanceMeters": 5000,
+            "activityType": "running",
+        }
     ]
     assert client.calls[0] == ("get_activities", (10, 5, "running"), {})
 
@@ -152,7 +157,8 @@ async def test_weight_flattens_daily_summaries(stub):
         }
     )
     out = await server.garmin_weight(start="2026-03-01", end="2026-03-04")
-    assert out == [{"date": "2026-03-04", "weight": 74500.0, "bmi": 22.1}]
+    # 74500 g on the wire must not reach the caller as a bare 74500.
+    assert out == [{"date": "2026-03-04", "weightKg": 74.5, "bmi": 22.1}]
 
 
 @pytest.mark.anyio

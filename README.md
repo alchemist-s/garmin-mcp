@@ -82,6 +82,7 @@ today; omitting a range means the last seven days.
 
 | Tool | What it returns |
 | --- | --- |
+| `garmin_briefing` | Sleep, HRV, stress, readiness, Body Battery and daily totals in one call |
 | `garmin_whoami` | Account name and unit preferences |
 | `garmin_devices` | Registered devices and last sync |
 | `garmin_daily_summary` | Steps, calories, floors, stress, body battery for a day |
@@ -106,6 +107,25 @@ today; omitting a range means the last seven days.
 | `garmin_activity_weather` | Weather during an activity |
 | `garmin_weight` | Weigh-ins and body composition |
 | `garmin_api_get` | Any Garmin API path, for what the above do not cover |
+
+### Units travel in the field name
+
+Garmin reports distances in metres, durations in seconds, speeds in metres per
+second and body mass in **grams**, all unlabelled. A bare `"weight": 74500`
+reads as kilograms to anything summarising it, and `"averageSpeed": 2.75` reads
+as km/h. So fields are renamed to carry their unit — `distanceMeters`,
+`durationSeconds`, `averageSpeedMetersPerSecond`, `weightKg` — and grams are
+converted, because that one is wrong rather than merely ambiguous. Foot-based
+activities also get a derived `pace` ("5:59 min/km"), which is the number a
+runner actually reads.
+
+### Rate limits
+
+Garmin answers `429` rather than queuing, per IP. Calls are capped at three in
+flight and retried with exponential backoff and jitter; the semaphore is
+released before sleeping, so one throttled call does not stall unrelated ones.
+A 429 that survives the retry budget reaches the caller as a message saying to
+wait, not as a generic failure.
 
 ### Why the responses are trimmed
 

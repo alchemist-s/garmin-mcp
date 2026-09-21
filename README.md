@@ -216,7 +216,8 @@ are minutes per kilometre and become the speed bands Garmin expects.
 
 Everything runs on your own computer. Requests go straight from your machine to
 Garmin: there is no server operated by the author, no telemetry, no analytics
-and no error reporting.
+and no error reporting. (The project *website* counts page views with Vercel
+Web Analytics; the server you install reports nothing.)
 
 **Your password** is used once, to obtain an access token. The token is saved at
 `~/.garminconnect` (mode `0600` inside a `0700` directory) and the password is

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1
+
+- Every tool now carries a human-readable title alongside its annotations, so
+  Claude Desktop shows "Training history by week" rather than
+  `garmin_training_history`. Tests refuse a tool that ships without one.
+
 ## 0.4.0
 
 Plans, not just readouts.

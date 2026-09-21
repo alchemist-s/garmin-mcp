@@ -2,7 +2,7 @@
   "manifest_version": "0.4",
   "name": "zonetwo",
   "display_name": "Zone Two",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Turn your running history into a training plan, on your watch. Works with Garmin Connect.",
   "long_description": "Zone Two reads your own Garmin Connect history so Claude can do something useful with it: look at what you have actually been running, design a plan that fits it, and put each session on your watch as a structured workout.\n\nAsk it to build a half marathon plan from your last six months, to tell you whether you are ready for intervals today, or to export your running history as a spreadsheet \u2014 the export Garmin makes awkward.\n\nSign in once. Enter your Garmin email and password below; if your account uses two-step verification, Garmin emails a code and Claude asks for it in the conversation. After that a saved token keeps you signed in for about a year.\n\nEverything runs on your own computer. Requests go straight to Garmin \u2014 there is no server in between and no analytics of any kind. Zone Two can create and schedule workouts, and it can never delete a recorded activity. It is not affiliated with or endorsed by Garmin.",
   "author": {

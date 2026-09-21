@@ -97,17 +97,22 @@ def tool(fn=None, /, **kwargs):
     return register(fn) if fn else register
 
 
-def write_tool(fn):
+def write_tool(fn=None, /, **kwargs):
     """Register a mutating tool; same translation, different annotations."""
-    return mcp.tool(
-        annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False)
-    )(explain_failures(fn))
+
+    def register(target):
+        return mcp.tool(
+            annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False),
+            **kwargs,
+        )(explain_failures(target))
+
+    return register(fn) if fn else register
 
 
 # --- profile and devices -------------------------------------------------
 
 
-@tool
+@tool(title="Garmin account")
 async def garmin_whoami() -> dict[str, Any]:
     """Identify the signed-in Garmin account and its unit preferences."""
     profile = await connection.call("get_user_profile")
@@ -127,7 +132,7 @@ async def garmin_whoami() -> dict[str, Any]:
     )
 
 
-@tool
+@tool(title="Your devices")
 async def garmin_devices() -> list[dict[str, Any]]:
     """List the Garmin devices registered to the account, newest sync first."""
     devices = await connection.call("get_devices")
@@ -150,7 +155,7 @@ async def garmin_devices() -> list[dict[str, Any]]:
 # --- daily wellness ------------------------------------------------------
 
 
-@tool
+@tool(title="Daily summary")
 async def garmin_daily_summary(date: str | None = None) -> dict[str, Any]:
     """Whole-day wellness rollup: steps, calories, distance, floors, stress, body battery."""
     cdate = parse_date(date)
@@ -196,7 +201,7 @@ async def garmin_daily_summary(date: str | None = None) -> dict[str, Any]:
     )
 
 
-@tool
+@tool(title="Sleep")
 async def garmin_sleep(date: str | None = None, raw: bool = False) -> dict[str, Any]:
     """Sleep for the night ending on the given date: stages, score and overnight vitals."""
     cdate = parse_date(date)
@@ -236,7 +241,7 @@ async def garmin_sleep(date: str | None = None, raw: bool = False) -> dict[str, 
     return prune(result)
 
 
-@tool
+@tool(title="Heart rate")
 async def garmin_heart_rate(date: str | None = None, raw: bool = False) -> dict[str, Any]:
     """Heart rate for a day. Summary gives min/max/resting; raw adds the 2-minute series."""
     cdate = parse_date(date)
@@ -255,7 +260,7 @@ async def garmin_heart_rate(date: str | None = None, raw: bool = False) -> dict[
     )
 
 
-@tool
+@tool(title="Heart rate variability")
 async def garmin_hrv(date: str | None = None) -> dict[str, Any]:
     """Overnight heart rate variability: last-night average, baseline and status."""
     cdate = parse_date(date)
@@ -284,7 +289,7 @@ async def garmin_hrv(date: str | None = None) -> dict[str, Any]:
     )
 
 
-@tool
+@tool(title="Stress")
 async def garmin_stress(date: str | None = None) -> dict[str, Any]:
     """All-day stress: average, max and time spent in each stress band."""
     cdate = parse_date(date)
@@ -308,7 +313,7 @@ async def garmin_stress(date: str | None = None) -> dict[str, Any]:
     )
 
 
-@tool
+@tool(title="Body Battery")
 async def garmin_body_battery(
     start: str | None = None, end: str | None = None
 ) -> list[dict[str, Any]]:
@@ -331,7 +336,7 @@ async def garmin_body_battery(
     ]
 
 
-@tool
+@tool(title="Steps")
 async def garmin_steps(
     start: str | None = None, end: str | None = None, intraday_date: str | None = None
 ) -> Any:
@@ -348,7 +353,7 @@ async def garmin_steps(
     ]
 
 
-@tool
+@tool(title="Blood oxygen")
 async def garmin_spo2(date: str | None = None) -> dict[str, Any]:
     """Pulse oximetry for a day: average and lowest overnight SpO2."""
     cdate = parse_date(date)
@@ -371,7 +376,7 @@ async def garmin_spo2(date: str | None = None) -> dict[str, Any]:
     )
 
 
-@tool
+@tool(title="Breathing rate")
 async def garmin_respiration(date: str | None = None) -> dict[str, Any]:
     """Breathing rate for a day: waking, sleeping, highest and lowest breaths per minute."""
     cdate = parse_date(date)
@@ -391,7 +396,7 @@ async def garmin_respiration(date: str | None = None) -> dict[str, Any]:
     )
 
 
-@tool
+@tool(title="Intensity minutes")
 async def garmin_intensity_minutes(date: str | None = None) -> dict[str, Any]:
     """Moderate and vigorous intensity minutes for a day, against the weekly goal."""
     cdate = parse_date(date)
@@ -402,7 +407,7 @@ async def garmin_intensity_minutes(date: str | None = None) -> dict[str, Any]:
 # --- training ------------------------------------------------------------
 
 
-@tool
+@tool(title="Training readiness")
 async def garmin_training_readiness(date: str | None = None) -> Any:
     """Training readiness score for a day, with the factors that drove it."""
     cdate = parse_date(date)
@@ -437,7 +442,7 @@ async def garmin_training_readiness(date: str | None = None) -> Any:
     ]
 
 
-@tool
+@tool(title="Training status")
 async def garmin_training_status(date: str | None = None) -> dict[str, Any]:
     """Training status, acute/chronic load balance and VO2 max as of a date."""
     cdate = parse_date(date)
@@ -480,7 +485,7 @@ async def garmin_training_status(date: str | None = None) -> dict[str, Any]:
     return prune(result)
 
 
-@tool
+@tool(title="VO2 max and fitness age")
 async def garmin_vo2max(date: str | None = None) -> dict[str, Any]:
     """VO2 max, fitness age and heat/altitude acclimation as of a date."""
     cdate = parse_date(date)
@@ -510,7 +515,7 @@ async def garmin_vo2max(date: str | None = None) -> dict[str, Any]:
     )
 
 
-@tool
+@tool(title="Race time predictions")
 async def garmin_race_predictions() -> dict[str, Any]:
     """Predicted race times for 5K, 10K, half and full marathon."""
     data = await connection.call("get_race_predictions")
@@ -527,7 +532,7 @@ async def garmin_race_predictions() -> dict[str, Any]:
     )
 
 
-@tool
+@tool(title="Personal records")
 async def garmin_personal_records() -> Any:
     """Personal records across activity types."""
     data = await connection.call("get_personal_record")
@@ -554,7 +559,7 @@ async def garmin_personal_records() -> Any:
 # --- activities ----------------------------------------------------------
 
 
-@tool
+@tool(title="Recent activities")
 async def garmin_activities(
     limit: int = 10, offset: int = 0, activity_type: str | None = None
 ) -> list[dict[str, Any]]:
@@ -564,7 +569,7 @@ async def garmin_activities(
     return [summarise_activity(a) for a in items]
 
 
-@tool
+@tool(title="Activities in a date range")
 async def garmin_activities_by_date(
     start: str | None = None, end: str | None = None, activity_type: str | None = None
 ) -> list[dict[str, Any]]:
@@ -574,14 +579,14 @@ async def garmin_activities_by_date(
     return [summarise_activity(a) for a in data or []]
 
 
-@tool
+@tool(title="Most recent activity")
 async def garmin_last_activity() -> dict[str, Any]:
     """The most recently recorded activity."""
     data = await connection.call("get_last_activity")
     return summarise_activity(data or {})
 
 
-@tool
+@tool(title="Activity detail")
 async def garmin_activity(activity_id: str, raw: bool = False) -> dict[str, Any]:
     """One activity in detail. raw=true returns the full payload including chart samples."""
     if raw:
@@ -623,7 +628,7 @@ async def garmin_activity(activity_id: str, raw: bool = False) -> dict[str, Any]
     return add_pace(result, type_key)
 
 
-@tool
+@tool(title="Activity splits")
 async def garmin_activity_splits(activity_id: str) -> Any:
     """Per-lap splits for an activity."""
     data = await connection.call("get_activity_splits", activity_id)
@@ -653,7 +658,7 @@ async def garmin_activity_splits(activity_id: str) -> Any:
     )
 
 
-@tool
+@tool(title="Activity weather")
 async def garmin_activity_weather(activity_id: str) -> dict[str, Any]:
     """Weather recorded during an activity."""
     data = await connection.call("get_activity_weather", activity_id)
@@ -675,7 +680,7 @@ async def garmin_activity_weather(activity_id: str) -> dict[str, Any]:
 # --- body composition ----------------------------------------------------
 
 
-@tool
+@tool(title="Weight and body composition")
 async def garmin_weight(start: str | None = None, end: str | None = None) -> Any:
     """Weigh-ins over a date range (default: last 7 days), with body composition where recorded."""
     first, last = date_range(start, end)
@@ -709,7 +714,7 @@ async def garmin_weight(start: str | None = None, end: str | None = None) -> Any
 # --- composite -----------------------------------------------------------
 
 
-@tool
+@tool(title="Morning briefing")
 async def garmin_briefing(date: str | None = None) -> dict[str, Any]:
     """Morning snapshot in one call: sleep, HRV, Body Battery, readiness, stress and RHR.
 
@@ -758,7 +763,7 @@ async def garmin_briefing(date: str | None = None) -> dict[str, Any]:
 # --- escape hatch --------------------------------------------------------
 
 
-@tool
+@tool(title="Direct Garmin API request")
 async def garmin_api_get(path: str) -> Any:
     """Call any Garmin Connect API path directly (read-only GET).
 
@@ -775,7 +780,7 @@ async def garmin_api_get(path: str) -> Any:
 # --- training history ----------------------------------------------------
 
 
-@tool
+@tool(title="Training history by week")
 async def garmin_training_history(weeks: int = 12, activity_type: str = "running") -> dict[str, Any]:
     """Weekly training volume over recent weeks — the input for writing a plan.
 
@@ -839,7 +844,7 @@ async def garmin_training_history(weeks: int = 12, activity_type: str = "running
     )
 
 
-@tool
+@tool(title="Export activities as CSV")
 async def garmin_export_activities(
     start: str | None = None, end: str | None = None, activity_type: str | None = None
 ) -> str:
@@ -888,7 +893,7 @@ async def garmin_export_activities(
 # --- plans (always available) --------------------------------------------
 
 
-@write_tool
+@write_tool(title="Create a workout")
 async def garmin_create_workout(
     name: str,
     steps: list[dict[str, Any]],
@@ -925,7 +930,7 @@ async def garmin_create_workout(
     return result
 
 
-@write_tool
+@write_tool(title="Schedule a workout")
 async def garmin_schedule_workout(workout_id: str, date: str) -> dict[str, Any]:
     """Put an existing workout on the calendar for a given date."""
     cdate = parse_date(date)
@@ -933,7 +938,7 @@ async def garmin_schedule_workout(workout_id: str, date: str) -> dict[str, Any]:
     return {"workoutId": workout_id, "scheduledFor": cdate, "status": "scheduled"}
 
 
-@tool
+@tool(title="Saved workouts")
 async def garmin_list_workouts(limit: int = 25) -> list[dict[str, Any]]:
     """List the workouts saved on the Garmin account, newest first."""
     data = await connection.call("get_workouts", 0, limit)
@@ -946,7 +951,7 @@ async def garmin_list_workouts(limit: int = 25) -> list[dict[str, Any]]:
     ]
 
 
-@tool
+@tool(title="Scheduled workouts")
 async def garmin_scheduled_workouts(year: int | None = None, month: int | None = None) -> Any:
     """List workouts scheduled in a given month (defaults to the current one)."""
     today = date.today()
@@ -960,14 +965,14 @@ async def garmin_scheduled_workouts(year: int | None = None, month: int | None =
     )
 
 
-@write_tool
+@write_tool(title="Unschedule a workout")
 async def garmin_unschedule_workout(scheduled_workout_id: str) -> dict[str, Any]:
     """Remove a scheduled workout from the calendar. The workout itself is kept."""
     await connection.call("unschedule_workout", scheduled_workout_id)
     return {"scheduledWorkoutId": scheduled_workout_id, "status": "unscheduled"}
 
 
-@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=True))
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=True), title="Delete a saved workout")
 async def garmin_delete_workout(workout_id: str) -> dict[str, Any]:
     """Delete a saved workout. Only affects plans — recorded activities cannot be deleted."""
     await connection.call("delete_workout", workout_id)
@@ -977,7 +982,7 @@ async def garmin_delete_workout(workout_id: str) -> dict[str, Any]:
 # --- sign-in -------------------------------------------------------------
 
 
-@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False))
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False), title="Finish signing in to Garmin")
 async def garmin_submit_mfa_code(code: str) -> dict[str, Any]:
     """Finish signing in to Garmin with the one-time code it emailed.
 
@@ -993,13 +998,13 @@ async def garmin_submit_mfa_code(code: str) -> dict[str, Any]:
 
 if RECORD_WRITES_ENABLED:
 
-    @write_tool
+    @write_tool(title="Rename an activity")
     async def garmin_rename_activity(activity_id: str, name: str) -> dict[str, Any]:
         """Rename an activity in Garmin Connect."""
         await connection.call("set_activity_name", activity_id, name)
         return {"activityId": activity_id, "activityName": name, "status": "renamed"}
 
-    @write_tool
+    @write_tool(title="Record a weigh-in")
     async def garmin_add_weight(weight: float, unit: str = "kg") -> dict[str, Any]:
         """Record a manual weigh-in. unit is 'kg' or 'lbs'."""
         if unit not in {"kg", "lbs"}:
@@ -1007,7 +1012,7 @@ if RECORD_WRITES_ENABLED:
         await connection.call("add_weigh_in", weight, unit)
         return {"weight": weight, "unit": unit, "status": "recorded"}
 
-    @write_tool
+    @write_tool(title="Log hydration")
     async def garmin_add_hydration(milliliters: float, date: str | None = None) -> dict[str, Any]:
         """Log fluid intake in millilitres for a day."""
         cdate = parse_date(date)

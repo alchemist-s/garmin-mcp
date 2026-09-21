@@ -1,6 +1,8 @@
 """The desktop bundle manifest must stay in step with the package."""
 
 import json
+
+import pytest
 import tomllib
 from pathlib import Path
 
@@ -62,3 +64,25 @@ def test_readme_has_a_privacy_section():
 def test_site_pages_exist_for_the_policy_link():
     assert (ROOT / "site" / "index.html").is_file()
     assert (ROOT / "site" / "privacy.html").is_file()
+
+
+@pytest.mark.anyio
+async def test_every_tool_has_a_title_and_annotations():
+    """The directory expects both; a tool without a title shows as a raw name."""
+    from zonetwo.server import mcp
+
+    tools = await mcp.list_tools()
+    assert tools, "no tools registered"
+    untitled = [t.name for t in tools if not getattr(t, "title", None)]
+    unannotated = [t.name for t in tools if t.annotations is None]
+    assert untitled == [], f"tools without a title: {untitled}"
+    assert unannotated == [], f"tools without annotations: {unannotated}"
+
+
+@pytest.mark.anyio
+async def test_titles_are_human_readable_not_function_names():
+    from zonetwo.server import mcp
+
+    for tool in await mcp.list_tools():
+        assert "_" not in tool.title, f"{tool.name} title looks like an identifier"
+        assert tool.title[0].isupper(), f"{tool.name} title should read as a label"
